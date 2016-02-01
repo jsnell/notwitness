@@ -24,17 +24,49 @@ var puzzles = {
         rows: 3,
         cols: 2,
         area: [
-            { r: 1.5, c: 0.5, type: "blob", color: "black" }
+            { r: 0.5, c: 0.5, type: "blob", color: "white" },
+            { r: 1.5, c: 0.5, type: "blob", color: "black" },
         ],
         edge: [
             { r: 0, c: 0.5, type: "blocked" },
+            { r: 2, c: 0.5, type: "blocked" },
         ],
         corner: [
-            { r: 0, c: 1, type: "exit" },
-            { r: 2, c: 0, type: "entrance" }
+            { r: 0, c: 1, type: "exit", direction: 'up' },
+            { r: 2, c: 0, type: "entrance" },
+        ],
+    },
+    tutorial2: {
+        rows: 3,
+        cols: 4,
+        area: [
+            { r: 0.5, c: 0.5, type: "blob", color: "white" },
+            { r: 1.5, c: 0.5, type: "blob", color: "white" },
+            { r: 1.5, c: 2.5, type: "blob", color: "black" },
+        ],
+        edge: [
+        ],
+        corner: [
+            { r: 0, c: 1, type: "exit", direction: 'up' },
+            { r: 2, c: 1, type: "entrance" },
         ],
     }
 };
+
+function directionToDelta(direction) {
+    var xd = 0, yd = 0;
+    if (direction == 'up') {
+        yd = -1;
+    } else if (direction == 'down') {
+        yd = 1;
+    } else if (direction == 'right') {
+        xd = 1;
+    } else if (direction == 'left') {
+        xd = -1;
+    }
+
+    return [xd, yd];
+}
 
 function Game() {
     var game = this;
@@ -45,9 +77,15 @@ function Game() {
 
     game.init = function(puzzle, callback) {
         game.puzzle = puzzle;
+        game.speed = 1;
         game.nextDirection = null;
+        game.failedSymbols = [];
+        game.animateState = 0;
 
         line.segments.push([0, 2]);
+        line.segments.push([1, 2]);
+        line.segments.push([1, 1]);
+        line.segments.push([1, 0]);
         setInterval(callback, 1000/30.0);
     };
 
@@ -67,13 +105,116 @@ function Game() {
             game.nextDirection = direction;
         }
     }
+
+    game.finishLevel = function() {
+        game.failedSymbols = game.findFailedSymbols();
+        game.over = true;
+        game.animateState = 0;
+    }
+
+    game.findFailedSymbols = function() {
+        var areas = game.findSymbolsByArea();
+        var errors = [];
+        _(areas).each(function(area) {
+            _(area).each(function(symbol) {
+                if (!game.validateSymbol(symbol, area)) {
+                    errors.push(symbol);
+                }
+            });
+        });
+
+        return errors;
+    }
+
+    game.validateSymbol = function(symbol, area) {
+        if (symbol.type == 'blob') {
+            return !area.find(function (other) {
+                return other.type == 'blob' && other.color != symbol.color;
+            });
+        }
+
+        return false;
+    };
+
+    game.findSymbolsByArea = function() {
+        var edges = {};
+        var prev = null;
+        _(line.segments).each(function(seg) {
+            if (prev != null) {
+                var c = (seg[0] + prev[0]) / 2;
+                var r = (seg[1] + prev[1]) / 2;
+                edges[[c, r]] = true;
+            }
+            prev = seg;
+        });
+
+        var areas = [];
+        var id = 0;
+        for (var c = 0; c < game.puzzle.cols - 1; ++c) {
+            var col = [];
+            areas[c] = col;
+            for (var r = 0; r < game.puzzle.rows - 1; ++r) {
+                col.push(++id);
+            }
+        }
+
+        function merge(x, y) {
+            for (var r = 0; r < game.puzzle.rows - 1; ++r) {
+                for (var c = 0; c < game.puzzle.cols - 1; ++c) {
+                    if (areas[c][r] == y) {
+                        areas[c][r] = x;
+                    }
+                }
+            }
+        }
+
+        function tryMerge(loc1, loc2) {
+            if (loc2[0] >= game.puzzle.cols - 1||
+                loc2[1] >= game.puzzle.rows - 1) {
+                return;
+            }
+            var edge = [ (loc1[0] + loc2[0]) / 2 + 0.5,
+                         (loc1[1] + loc2[1]) / 2 + 0.5 ];
+            if (edges[edge]) {
+                return;
+            }
+            merge(areas[loc1[0]][loc1[1]],
+                  areas[loc2[0]][loc2[1]])
+        }
+
+        for (var r = 0; r < game.puzzle.rows - 1; ++r) {
+            for (var c = 0; c < game.puzzle.cols - 1; ++c) {
+                tryMerge([c, r], [c, r + 1]);
+                tryMerge([c, r], [c + 1, r]);
+            }
+        }
+
+        var symbols = {};
+
+        _(game.puzzle.area).each(function (area) {
+            var id = areas[area.c - 0.5][area.r - 0.5];
+            if (!symbols[id]) {
+                symbols[id] = []
+            }
+            symbols[id].push(area);
+        });
+
+        return _(symbols).values();
+    };
     
     game.update = function() {
+        game.animateState++;
+
+        if (game.over) {
+            return;
+        }
         if (line.next) {
             if (!line.next.maxProgress ||
                 line.next.sign < 0 ||
                 line.next.progress < line.next.maxProgress) {
                 line.next.progress += 0.02 * line.next.sign;
+            } else if (line.next.exit) {
+                game.finishLevel();
             }
 
             if (line.next.progress <= 0) {
@@ -97,6 +238,7 @@ function Game() {
         var next;
         var direction = game.nextDirection;
         var reverseDirection;
+        var maxProgress = null;
 
         if (direction == 'up') {
             next = [last[0], last[1] - 1]
@@ -114,9 +256,16 @@ function Game() {
             return;
         }
 
-        if (next[1] < 0 || next[1] >= game.puzzle.rows ||
-            next[0] < 0 || next[0] >= game.puzzle.cols) {
-            return;
+        var exit = game.findExit(last, direction);
+
+        if (exit) {
+            next = exit;
+            maxProgress = 0.2;
+        } else {
+            if (next[1] < 0 || next[1] >= game.puzzle.rows ||
+                next[0] < 0 || next[0] >= game.puzzle.cols) {
+                return;
+            }
         }
 
         if (line.segments.length > 1) {
@@ -135,8 +284,6 @@ function Game() {
                 return;
             }
         }
-
-        var maxProgress = null;
 
         _(line.segments).each(function(seg) {
             if (seg[0] == next[0] && seg[1] == next[1]) {
@@ -163,20 +310,60 @@ function Game() {
             maxProgress: maxProgress,
             direction: direction,
             reverseDirection: reverseDirection,
+            exit: (exit != null),
             sign: 1
         };
     };
 
+    game.findExit = function (loc, direction) {
+        var exit = null;
+        _(game.puzzle.corner).each(function(corner) {
+            if (corner.type == 'exit' &&
+                corner.direction == direction &&
+                corner.r == loc[1] &&
+                corner.c == loc[0]) {
+                exit = corner;
+            }
+        });
+
+        if (exit) {
+            var d = directionToDelta(direction);
+            return [ exit.c + d[0], exit.r + d[1] ]
+        }
+    }
+
     game.draw = function (canvas, ctx) {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
+        game.drawSymbols(canvas, ctx, game.failedSymbols,
+                         function (symbol, ctx) {
+                             if ((game.animateState & 31) < 16) {
+                                 ctx.fillStyle = '#d44';
+                             } else {
+                                 ctx.fillStyle = symbol.color;
+                             }
+                             return true;
+                         });
+        
         WithContext(ctx, game.drawParams(0, 0),
                     function () {
-                        ctx.strokeStyle = ctx.fillStyle = '#eee';
+                        ctx.lineWidth = 1;
+
+                        var color;
+                        if (!game.over) {
+                            color = '#eee';
+                        } else if (game.failedSymbols.length == 0) {
+                            color = '#fff';
+                            ctx.lineWidth = 2;
+                        } else {
+                            color = '#d44';
+                            ctx.lineWidth = 2;
+                        }
+                        
+                        ctx.strokeStyle = ctx.fillStyle = color;
                         var last = null;
 
                         ctx.beginPath();
-                        ctx.lineWidth = 1;
                         _(line.segments).each(function (seg) {
                             var x = seg[0] * 10; 
                             var y = seg[1] * 10;
@@ -199,7 +386,8 @@ function Game() {
 
                         if (line.next) {
                             ctx.beginPath();
-                            ctx.arc(headx, heady, 0.5, 2*Math.PI, 0);
+                            ctx.arc(headx, heady, ctx.lineWidth / 2,
+                                    2*Math.PI, 0);
                             ctx.fill();
                         }
 
@@ -207,7 +395,7 @@ function Game() {
                             var x = seg[0] * 10; 
                             var y = seg[1] * 10;
                             ctx.beginPath();
-                            ctx.arc(x, y, 0.5, 2*Math.PI, 0);
+                            ctx.arc(x, y, ctx.lineWidth / 2, 2*Math.PI, 0);
                             ctx.fill();
                         });
                     });
@@ -252,11 +440,54 @@ function Game() {
             }
         }
 
-        _(game.puzzle.area).each(function (area) {
-            WithContext(ctx, game.drawParams(area.c, area.r),
+        game.drawSymbols(canvas, ctx, game.puzzle.area, function (symbol, ctx) {
+            ctx.fillStyle = symbol.color;
+            return true;
+        });
+
+        _(game.puzzle.edge).each(function (edge) {
+            WithContext(ctx, game.drawParams(edge.c, edge.r),
                         function () {
-                            ctx.fillStyle = area.color;
-                            if (area.type == "blob") {
+                            ctx.fillStyle = '#9080c0';
+                            ctx.fillRect(-1, -1, 2, 2);
+                        })
+        });
+                       
+        _(game.puzzle.corner).each(function (corner) {
+            WithContext(ctx, game.drawParams(corner.c, corner.r),
+                        function () {
+                            if (corner.type == "entrance") {
+                                ctx.beginPath();
+                                ctx.arc(0, 0, 3, 2*Math.PI, 0);
+                                ctx.fill();
+                            }
+                            if (corner.type == "exit") {
+                                var d = directionToDelta(corner.direction);
+                                var x = 2 * d[0];
+                                var y = 2 * d[1];
+                                ctx.beginPath();
+                                ctx.moveTo(0, 0);
+                                ctx.lineTo(x, y);
+                                ctx.stroke();
+
+                                ctx.beginPath();
+                                ctx.arc(x, y, 1, 2*Math.PI, 0);
+                                ctx.fill();
+                            }
+                        });
+        });
+
+        ctx.restore();
+    }
+
+    game.drawSymbols = function (canvas, ctx, symbols, thunk) {
+        _(symbols).each(function (symbol) {
+            WithContext(ctx, game.drawParams(symbol.c, symbol.r),
+                        function () {
+                            if (!thunk(symbol, ctx)) {
+                                return;
+                            }
+                            if (symbol.type == "blob") {
                                 ctx.beginPath();
                                 ctx.arc(-1, -1, 1, 2*Math.PI, 0);
                                 ctx.fill();
@@ -278,38 +509,7 @@ function Game() {
                             }
                         })
         });
-
-        _(game.puzzle.edge).each(function (edge) {
-            WithContext(ctx, game.drawParams(edge.c, edge.r),
-                        function () {
-                            ctx.fillStyle = '#9080c0';
-                            ctx.fillRect(-1, -1, 2, 2);
-                        })
-        });
-                       
-        _(game.puzzle.corner).each(function (corner) {
-            WithContext(ctx, game.drawParams(corner.c, corner.r),
-                        function () {
-                            if (corner.type == "entrance") {
-                                ctx.beginPath();
-                                ctx.arc(0, 0, 3, 2*Math.PI, 0);
-                                ctx.fill();
-                            }
-                            if (corner.type == "exit") {
-                                ctx.beginPath();
-                                ctx.moveTo(0, 0);
-                                ctx.lineTo(5, 0);
-                                ctx.stroke();
-
-                                ctx.beginPath();
-                                ctx.arc(5, 0, 1, 2*Math.PI, 0);
-                                ctx.fill();
-                            }
-                        });
-        });
-
-        ctx.restore();
-    }
+    };
 }
 
 function UserInterface() {
@@ -333,36 +533,38 @@ function UserInterface() {
         };
         function updateAndDraw() {
             // Run physics N times
-            for (var i = 0; i < 1; ++i) {
+            for (var i = 0; i < ui.game.speed; ++i) {
                 game.update();
             }
             // Then draw the last state
             ui.redraw();
         };
-        game.init(puzzles.tutorial1, updateAndDraw);
+        game.init(puzzles.tutorial2, updateAndDraw);
         game.drawBase(map_canvas,
                       map_canvas.getContext("2d"));
         ui.redraw();
     }
 
     ui.keyup = function(event) {
-        ui.checkKeyUp(event, null, 87, 83, 65, 68);
-        ui.checkKeyUp(event, null, 38, 40, 37, 39);
+        ui.checkKeyUp(event, null, 87, 83, 65, 68, 16);
+        ui.checkKeyUp(event, null, 38, 40, 37, 39, 16);
     };
 
-    ui.checkKeyUp = function(event, launcher, up, down, left, right) {
+    ui.checkKeyUp = function(event, launcher, up, down, left, right, speed) {
         if (event.keyCode == up) {
         } else if (event.keyCode == right) {
         } else if (event.keyCode == left) {
+        } else if (event.keyCode == speed) {
+            ui.game.speed = 1;
         }
     };
 
     ui.keydown = function(event) {
-        ui.checkKeyDown(event, null, 87, 83, 65, 68);
-        ui.checkKeyDown(event, null, 38, 40, 37, 39);
+        ui.checkKeyDown(event, null, 87, 83, 65, 68, 16);
+        ui.checkKeyDown(event, null, 38, 40, 37, 39, 16);
     };
     
-    ui.checkKeyDown = function(event, launcher, up, down, left, right) {
+    ui.checkKeyDown = function(event, launcher, up, down, left, right, speed) {
         if (event.keyCode == up) {
             ui.game.setDirection('up');
         } else if (event.keyCode == down) {
@@ -371,6 +573,8 @@ function UserInterface() {
             ui.game.setDirection('right');
         } else if (event.keyCode == left) {
             ui.game.setDirection('left');
+        } else if (event.keyCode == speed) {
+            ui.game.speed = 3;
         }
     };
 }
