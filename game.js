@@ -24,7 +24,7 @@ var puzzles = {
         rows: 3,
         cols: 2,
         area: [
-            { r: 1, c: 0, type: "blob", color: "black" }
+            { r: 1.5, c: 0.5, type: "blob", color: "black" }
         ],
         edge: [
             { r: 0, c: 0.5, type: "blocked" },
@@ -88,6 +88,33 @@ function Game() {
                             });
             }
         }
+
+        _(game.puzzle.area).each(function (area) {
+            WithContext(ctx, game.drawParams(area.c, area.r),
+                        function () {
+                            ctx.fillStyle = area.color;
+                            if (area.type == "blob") {
+                                ctx.beginPath();
+                                ctx.arc(-1, -1, 1, 2*Math.PI, 0);
+                                ctx.fill();
+
+                                ctx.beginPath();
+                                ctx.arc(-1, 1, 1, 2*Math.PI, 0);
+                                ctx.fill();
+
+                                ctx.beginPath();
+                                ctx.arc(1, 1, 1, 2*Math.PI, 0);
+                                ctx.fill();
+
+                                ctx.beginPath();
+                                ctx.arc(1, -1, 1, 2*Math.PI, 0);
+                                ctx.fill();
+
+                                ctx.fillRect(-2, -1, 4, 2);
+                                ctx.fillRect(-1, -2, 2, 4);
+                            }
+                        })
+        });
 
         _(game.puzzle.edge).each(function (edge) {
             WithContext(ctx, game.drawParams(edge.c, edge.r),
