@@ -35,6 +35,8 @@ var puzzles = {
             { r: 0, c: 1, type: "exit", direction: 'up' },
             { r: 2, c: 0, type: "entrance" },
         ],
+        unlock: "tutorial2",
+        active: true,
     },
     tutorial2: {
         rows: 3,
@@ -50,6 +52,27 @@ var puzzles = {
             { r: 0, c: 1, type: "exit", direction: 'up' },
             { r: 2, c: 1, type: "entrance" },
         ],
+        unlock: "tutorial3",
+        active: false,
+    },
+    tutorial3: {
+        rows: 3,
+        cols: 3,
+        area: [
+            { r: 0.5, c: 0.5, type: "blob", color: "white" },
+            // { r: 0.5, c: 1.5, type: "inherit", id: "tutorial2" },
+            { r: 0.5, c: 1.5, type: "blob", id: "black" },
+            { r: 1.5, c: 0.5, type: "blob", color: "white" },
+            { r: 1.5, c: 1.5, type: "blob", color: "black" },
+        ],
+        edge: [
+        ],
+        corner: [
+            { r: 0, c: 1, type: "exit", direction: 'up' },
+            { r: 2, c: 1, type: "entrance" },
+        ],
+        unlock: "tutorial4",
+        active: false,
     }
 };
 
@@ -70,23 +93,47 @@ function directionToDelta(direction) {
 
 function Game() {
     var game = this;
-    var line = {
-        segments: [],
-        next: null,
-    }
-
-    game.init = function(puzzle, callback) {
+    var line;
+    var updateAndDraw;
+    var gameOverCallback;
+    var timer;
+    
+    game.init = function(puzzle, update_cb, game_over_cb) {
         game.puzzle = puzzle;
+        updateAndDraw = update_cb;
+        gameOverCallback = game_over_cb;
+
+        game.reset();
+    };
+
+    game.reset = function() {
         game.speed = 1;
         game.nextDirection = null;
         game.failedSymbols = [];
         game.animateState = 0;
+        game.over = false;
+        line = {
+            segments: [],
+            next: null,
+        }
 
-        line.segments.push([0, 2]);
-        line.segments.push([1, 2]);
-        line.segments.push([1, 1]);
-        line.segments.push([1, 0]);
-        setInterval(callback, 1000/30.0);
+        _(game.puzzle.corner).each(function (corner) {
+            if (corner.type == 'entrance') {
+                line.segments.push([corner.c, corner.r]);
+            }
+        });
+    }
+
+    game.pause = function() {
+        if (timer) {
+            clearInterval(timer);
+            timer = null;
+        }
+    };
+    game.start = function() {
+        if (!timer) {
+            timer = setInterval(updateAndDraw, 1000/30.0);
+        }
     };
 
     game.setDirection = function(direction) {
@@ -110,7 +157,15 @@ function Game() {
         game.failedSymbols = game.findFailedSymbols();
         game.over = true;
         game.animateState = 0;
+
+        if (gameOverCallback) {
+            gameOverCallback();
+        }
     }
+
+    game.won = function() {
+        return game.over && game.failedSymbols.length == 0;
+    };
 
     game.findFailedSymbols = function() {
         var areas = game.findSymbolsByArea();
@@ -208,11 +263,13 @@ function Game() {
         if (game.over) {
             return;
         }
+        var scale = Math.sqrt(Math.max(game.puzzle.cols, game.puzzle.rows));
+
         if (line.next) {
             if (!line.next.maxProgress ||
                 line.next.sign < 0 ||
                 line.next.progress < line.next.maxProgress) {
-                line.next.progress += 0.02 * line.next.sign;
+                line.next.progress += scale * 0.02 * line.next.sign;
             } else if (line.next.exit) {
                 game.finishLevel();
             }
@@ -332,8 +389,10 @@ function Game() {
         }
     }
 
-    game.draw = function (canvas, ctx) {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
+    game.draw = function (canvas, ctx, overlay) {
+        if (!overlay) {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
 
         game.drawSymbols(canvas, ctx, game.failedSymbols,
                          function (symbol, ctx) {
@@ -514,35 +573,100 @@ function Game() {
 
 function UserInterface() {
     var ui = this;
-    ui.game = null;
+    var games = {};
+    var screenshots = {};
+    var game;
 
-    ui.init = function(game) {
-        ui.game = game;
-
-        var map_canvas = document.getElementById("canvas-map");
-            
+    ui.init = function(puzzleName) {            
         ui.redraw = function() {
             var objects_canvas = document.getElementById("canvas-objects");
             var ctx = objects_canvas.getContext("2d");
             WithContext(ctx, {},
                         function () {
                             game.draw(objects_canvas, ctx);
-                            // game.draw(map_canvas,
-                            //           map_canvas.getContext("2d"));
                         });
         };
-        function updateAndDraw() {
+        ui.updateAndDraw = function() {
             // Run physics N times
-            for (var i = 0; i < ui.game.speed; ++i) {
+            for (var i = 0; i < game.speed; ++i) {
                 game.update();
             }
             // Then draw the last state
             ui.redraw();
         };
-        game.init(puzzles.tutorial2, updateAndDraw);
+        _(puzzles).each(function(elem, key) {
+            ui.initScreenshot(key);
+        });
+        ui.switchToPuzzle(puzzleName);
+    };
+
+    ui.ensureGame = function(puzzleName) {
+        var game = games[puzzleName];
+        if (!game) {
+            game = games[puzzleName] = new Game();
+            puzzles[puzzleName].name = puzzleName;
+            game.init(puzzles[puzzleName],
+                      ui.updateAndDraw,
+                      function () {
+                          ui.updateScreenshot(game);
+                          if (game.won() && game.puzzle.unlock) {
+                              var unlocked = puzzles[game.puzzle.unlock];
+                              unlocked.active = true;
+                              ui.updateScreenshot(ui.ensureGame(game.puzzle.unlock));
+                          }
+                      });
+        }
+        return game;
+    };
+    
+    ui.switchToPuzzle = function(puzzleName) {
+        var map_canvas = document.getElementById("canvas-map");
+
+        if (game) {
+            game.pause();
+            ui.updateScreenshot(game);
+        }
+        game = ui.ensureGame(puzzleName);
+        game.start();
+        
         game.drawBase(map_canvas,
                       map_canvas.getContext("2d"));
-        ui.redraw();
+        // ui.redraw();
+        ui.updateScreenshot(game);
+        $('div.puzzle-selector img').removeClass('selected');
+        $('#screenshot-' + puzzleName).addClass('selected');
+    };
+
+    ui.updateScreenshot = function(game) {
+        var img = document.getElementById("screenshot-" + game.puzzle.name);
+        if (!img) {
+            img = ui.initScreenshot(game.puzzle.name);
+        }
+
+        var canvas_ss = document.getElementById("canvas-screenshot");
+        var ctx = canvas_ss.getContext("2d");
+        ctx.clearRect(0, 0, canvas_ss.width, canvas_ss.height);
+
+        game.drawBase(canvas_ss, ctx);
+        game.draw(canvas_ss, ctx, true);
+        img.src = canvas_ss.toDataURL();
+
+        img.onclick = function() {
+            ui.switchToPuzzle(game.puzzle.name);
+        };
+        console.log(game.puzzle.name);
+    };
+
+    ui.initScreenshot = function(name) {
+        var img = new Image();
+        img.id = 'screenshot-' + name;
+        $('.puzzle-selector').append(img);
+        var canvas_ss = document.getElementById("canvas-screenshot");
+        var ctx = canvas_ss.getContext("2d");
+        ctx.fillStyle = "black";
+        ctx.fillRect(0, 0, canvas_ss.width, canvas_ss.height);
+        img.src = canvas_ss.toDataURL();
+        return img;
     }
 
     ui.keyup = function(event) {
@@ -555,7 +679,9 @@ function UserInterface() {
         } else if (event.keyCode == right) {
         } else if (event.keyCode == left) {
         } else if (event.keyCode == speed) {
-            ui.game.speed = 1;
+            game.speed = 1;
+        } else if (event.keyCode == 32) {
+            game.reset();
         }
     };
 
@@ -566,25 +692,22 @@ function UserInterface() {
     
     ui.checkKeyDown = function(event, launcher, up, down, left, right, speed) {
         if (event.keyCode == up) {
-            ui.game.setDirection('up');
+            game.setDirection('up');
         } else if (event.keyCode == down) {
-            ui.game.setDirection('down');
+            game.setDirection('down');
         } else if (event.keyCode == right) {
-            ui.game.setDirection('right');
+            game.setDirection('right');
         } else if (event.keyCode == left) {
-            ui.game.setDirection('left');
+            game.setDirection('left');
         } else if (event.keyCode == speed) {
-            ui.game.speed = 3;
+            game.speed = 3;
         }
     };
 }
 
 function init() {
-    game = new Game();
-    
     if (!ui) {
-        ui = new UserInterface(game);
+        ui = new UserInterface();
     }
-    ui.init(game);
-    return game;
+    ui.init('tutorial1');
 }

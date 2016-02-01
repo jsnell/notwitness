@@ -8,15 +8,32 @@
         left:20px;
         top:20px;
     }
+    div.puzzle-selector {
+        margin-left: 20px;
+        overflow: auto;
+        height: 128;
+        width: 800;
+    }
+    div.puzzle-selector img {
+        width: 96;
+        height: 96;
+        padding: 8px;
+    }
+    div.puzzle-selector img.selected {
+        background-color: #8d8;
+    }
   </style>
   </head>
 <body onload='init()' onkeydown='ui.keydown(event)' onkeyup='ui.keyup(event)'>
   <div id="main-container" style="height: 520">
     <canvas id="canvas-objects" width=480 height=480 class="game-canvas" style="z-index: 2"></canvas>
     <canvas id="canvas-map" width=480 height=480 class="game-canvas" style="z-index: 1"></canvas>
+    <canvas id="canvas-screenshot" style="display: none" width=480 height=480></canvas>
   </div>
+  <div class='puzzle-selector'></div>
 
   <p>
     Arrow keys / WASD to steer. Hold down shift to increase speed.
+    Space to reset puzzle.
   </p>
 </body>
