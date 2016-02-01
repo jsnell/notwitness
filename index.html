@@ -5,14 +5,18 @@
   <style>
     canvas.game-canvas {
         position:absolute;
-        left:0px;
-        top:0px;
+        left:20px;
+        top:20px;
     }
   </style>
   </head>
 <body onload='init()' onkeydown='ui.keydown(event)' onkeyup='ui.keyup(event)'>
-  <div id="main-container">
+  <div id="main-container" style="height: 520">
     <canvas id="canvas-objects" width=480 height=480 class="game-canvas" style="z-index: 2"></canvas>
     <canvas id="canvas-map" width=480 height=480 class="game-canvas" style="z-index: 1"></canvas>
   </div>
+
+  <p>
+    Arrow keys / WASD to steer.
+  </p>
 </body>

@@ -45,20 +45,43 @@ function Game() {
 
     game.init = function(puzzle, callback) {
         game.puzzle = puzzle;
-        game.direction = null;
+        game.nextDirection = null;
 
         line.segments.push([0, 2]);
         setInterval(callback, 1000/30.0);
     };
+
+    game.setDirection = function(direction) {
+        var next = line.next;
+        if (next) {
+            if (direction == next.reverseDirection) {
+                next.sign = -1;
+                game.nextDirection = null;
+            } else if (direction == next.direction) {
+                next.sign = 1;
+                game.nextDirection = direction;
+            } else {
+                game.nextDirection = direction;
+            }
+        } else {
+            game.nextDirection = direction;
+        }
+    }
     
     game.update = function() {
         if (line.next) {
             if (!line.next.maxProgress ||
+                line.next.sign < 0 ||
                 line.next.progress < line.next.maxProgress) {
-                line.next.progress += 0.02;
+                line.next.progress += 0.02 * line.next.sign;
             }
 
-            if (line.next.progress >= 1) {
+            if (line.next.progress <= 0) {
+                if (!game.nextDirection) {
+                    game.nextDirection = line.next.reverseDirection;
+                }
+                line.next = null;
+            } else if (line.next.progress >= 1) {
                 line.segments.push(line.next.loc);
                 line.next = null;
             }
@@ -70,17 +93,23 @@ function Game() {
 
     game.selectTarget = function () {
         var last = line.segments[line.segments.length - 1]
+        var last2nd = null;
         var next;
-        var direction = game.direction;
-        
+        var direction = game.nextDirection;
+        var reverseDirection;
+
         if (direction == 'up') {
             next = [last[0], last[1] - 1]
+            reverseDirection = 'down';
         } else if (direction == 'down') {
             next = [last[0], last[1] + 1]
+            reverseDirection = 'up';
         } else if (direction == 'left') {
             next = [last[0] - 1 , last[1]]
+            reverseDirection = 'right';
         } else if (direction == 'right') {
             next = [last[0] + 1, last[1]]
+            reverseDirection = 'left';
         } else {
             return;
         }
@@ -88,6 +117,23 @@ function Game() {
         if (next[1] < 0 || next[1] >= game.puzzle.rows ||
             next[0] < 0 || next[0] >= game.puzzle.cols) {
             return;
+        }
+
+        if (line.segments.length > 1) {
+            last2nd = line.segments[line.segments.length - 2];
+            if (last2nd[0] == next[0] &&
+                last2nd[1] == next[1]) {
+                line.next = {
+                    loc: last,
+                    progress: 1.0,
+                    maxProgress: null,
+                    direction: reverseDirection,
+                    reverseDirection: direction,
+                    sign: -1
+                }
+                line.segments.pop();
+                return;
+            }
         }
 
         var maxProgress = null;
@@ -111,7 +157,14 @@ function Game() {
             maxProgress = 0.3;
         });
 
-        line.next = { loc: next, progress: 0.0, maxProgress: maxProgress };
+        line.next = {
+            loc: next,
+            progress: 0.0,
+            maxProgress: maxProgress,
+            direction: direction,
+            reverseDirection: reverseDirection,
+            sign: 1
+        };
     };
 
     game.draw = function (canvas, ctx) {
@@ -311,13 +364,13 @@ function UserInterface() {
     
     ui.checkKeyDown = function(event, launcher, up, down, left, right) {
         if (event.keyCode == up) {
-            ui.game.direction = 'up'
+            ui.game.setDirection('up');
         } else if (event.keyCode == down) {
-            ui.game.direction = 'down'
+            ui.game.setDirection('down');
         } else if (event.keyCode == right) {
-            ui.game.direction = 'right'
+            ui.game.setDirection('right');
         } else if (event.keyCode == left) {
-            ui.game.direction = 'left'
+            ui.game.setDirection('left');
         }
     };
 }
