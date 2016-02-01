@@ -38,16 +38,126 @@ var puzzles = {
 
 function Game() {
     var game = this;
+    var line = {
+        segments: [],
+        next: null,
+    }
 
-    game.init = function(puzzle) {
+    game.init = function(puzzle, callback) {
         game.puzzle = puzzle;
+        game.direction = null;
+
+        line.segments.push([0, 2]);
+        setInterval(callback, 1000/30.0);
     };
     
     game.update = function() {
+        if (line.next) {
+            if (!line.next.maxProgress ||
+                line.next.progress < line.next.maxProgress) {
+                line.next.progress += 0.02;
+            }
+
+            if (line.next.progress >= 1) {
+                line.segments.push(line.next.loc);
+                line.next = null;
+            }
+        }
+        if (!line.next) {
+            game.selectTarget();
+        }
+    };
+
+    game.selectTarget = function () {
+        var last = line.segments[line.segments.length - 1]
+        var next;
+        var direction = game.direction;
+        
+        if (direction == 'up') {
+            next = [last[0], last[1] - 1]
+        } else if (direction == 'down') {
+            next = [last[0], last[1] + 1]
+        } else if (direction == 'left') {
+            next = [last[0] - 1 , last[1]]
+        } else if (direction == 'right') {
+            next = [last[0] + 1, last[1]]
+        } else {
+            return;
+        }
+
+        if (next[1] < 0 || next[1] >= game.puzzle.rows ||
+            next[0] < 0 || next[0] >= game.puzzle.cols) {
+            return;
+        }
+
+        var maxProgress = null;
+
+        _(line.segments).each(function(seg) {
+            if (seg[0] == next[0] && seg[1] == next[1]) {
+                maxProgress = 0.8;
+            }
+        });
+
+        _(game.puzzle.edge).each(function(edge) {
+            if (edge.type != 'blocked') {
+                return;
+            }
+            if (edge.c != (next[0] + last[0]) / 2) {
+                return;
+            }
+            if (edge.r != (next[1] + last[1]) / 2) {
+                return;
+            }
+            maxProgress = 0.3;
+        });
+
+        line.next = { loc: next, progress: 0.0, maxProgress: maxProgress };
     };
 
     game.draw = function (canvas, ctx) {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        WithContext(ctx, game.drawParams(0, 0),
+                    function () {
+                        ctx.strokeStyle = ctx.fillStyle = '#eee';
+                        var last = null;
+
+                        ctx.beginPath();
+                        ctx.lineWidth = 1;
+                        _(line.segments).each(function (seg) {
+                            var x = seg[0] * 10; 
+                            var y = seg[1] * 10;
+                            if (last == null) {
+                                ctx.moveTo(x, y);
+                            } else {
+                                ctx.lineTo(x, y);
+                            }
+                            last = [x, y];
+                        });
+                        if (line.next) {
+                            var xd = ((line.next.loc[0] * 10)- last[0]) * line.next.progress;
+                            var yd = ((line.next.loc[1] * 10) - last[1]) * line.next.progress;
+                            var headx = last[0] + xd;
+                            var heady = last[1] + yd;
+                            ctx.lineTo(headx, heady);
+
+                        }
+                        ctx.stroke();
+
+                        if (line.next) {
+                            ctx.beginPath();
+                            ctx.arc(headx, heady, 0.5, 2*Math.PI, 0);
+                            ctx.fill();
+                        }
+
+                        _(line.segments).each(function (seg) {
+                            var x = seg[0] * 10; 
+                            var y = seg[1] * 10;
+                            ctx.beginPath();
+                            ctx.arc(x, y, 0.5, 2*Math.PI, 0);
+                            ctx.fill();
+                        });
+                    });
     };
 
     game.drawParams = function (c, r) {
@@ -163,7 +273,9 @@ function UserInterface() {
             var ctx = objects_canvas.getContext("2d");
             WithContext(ctx, {},
                         function () {
-                            ui.game.draw(objects_canvas, ctx);
+                            game.draw(objects_canvas, ctx);
+                            // game.draw(map_canvas,
+                            //           map_canvas.getContext("2d"));
                         });
         };
         function updateAndDraw() {
@@ -181,8 +293,8 @@ function UserInterface() {
     }
 
     ui.keyup = function(event) {
-        ui.checkKeyUp(event, ui.left, 87, 83, 65, 68);
-        ui.checkKeyUp(event, ui.right, 38, 40, 37, 39);
+        ui.checkKeyUp(event, null, 87, 83, 65, 68);
+        ui.checkKeyUp(event, null, 38, 40, 37, 39);
     };
 
     ui.checkKeyUp = function(event, launcher, up, down, left, right) {
@@ -193,15 +305,19 @@ function UserInterface() {
     };
 
     ui.keydown = function(event) {
-        ui.checkKeyDown(event, ui.left, 87, 83, 65, 68);
-        ui.checkKeyDown(event, ui.right, 38, 40, 37, 39);
+        ui.checkKeyDown(event, null, 87, 83, 65, 68);
+        ui.checkKeyDown(event, null, 38, 40, 37, 39);
     };
     
     ui.checkKeyDown = function(event, launcher, up, down, left, right) {
         if (event.keyCode == up) {
+            ui.game.direction = 'up'
         } else if (event.keyCode == down) {
+            ui.game.direction = 'down'
         } else if (event.keyCode == right) {
+            ui.game.direction = 'right'
         } else if (event.keyCode == left) {
+            ui.game.direction = 'left'
         }
     };
 }
