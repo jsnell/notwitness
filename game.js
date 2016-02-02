@@ -24,12 +24,9 @@ var puzzles = {
         rows: 3,
         cols: 2,
         area: [
-            { r: 0.5, c: 0.5, type: "blob", color: "white" },
             { r: 1.5, c: 0.5, type: "blob", color: "black" },
         ],
         edge: [
-            { r: 0, c: 0.5, type: "blocked" },
-            { r: 2, c: 0.5, type: "blocked" },
         ],
         corner: [
             { r: 0, c: 1, type: "exit", direction: 'up' },
@@ -575,6 +572,7 @@ function UserInterface() {
     var ui = this;
     var games = {};
     var screenshots = {};
+    var puzzleNames;
     var game;
 
     ui.init = function(puzzleName) {            
@@ -594,8 +592,9 @@ function UserInterface() {
             // Then draw the last state
             ui.redraw();
         };
-        _(puzzles).each(function(elem, key) {
-            ui.initScreenshot(key);
+        puzzleNames = _(puzzles).keys();
+        _(puzzleNames).each(function(name) {
+            ui.initScreenshot(name);
         });
         ui.switchToPuzzle(puzzleName);
     };
@@ -618,9 +617,28 @@ function UserInterface() {
         }
         return game;
     };
-    
+
+    ui.scrollPuzzle = function(delta) {
+        var i1 = puzzleNames.indexOf(game.puzzle.name);
+        var i2 = i1 + delta;
+        if (i2 < 0) {
+            return;
+        }
+        if (i2 >= puzzleNames.length) {
+            return;
+        }
+        var puzzleName = puzzleNames[i2];
+
+        ui.switchToPuzzle(puzzleName);
+    }
+
     ui.switchToPuzzle = function(puzzleName) {
         var map_canvas = document.getElementById("canvas-map");
+
+        var puzzle = puzzles[puzzleName];
+        if (!puzzle.active) {
+            return;
+        }
 
         if (game) {
             game.pause();
@@ -654,7 +672,6 @@ function UserInterface() {
         img.onclick = function() {
             ui.switchToPuzzle(game.puzzle.name);
         };
-        console.log(game.puzzle.name);
     };
 
     ui.initScreenshot = function(name) {
@@ -672,6 +689,7 @@ function UserInterface() {
     ui.keyup = function(event) {
         ui.checkKeyUp(event, null, 87, 83, 65, 68, 16);
         ui.checkKeyUp(event, null, 38, 40, 37, 39, 16);
+        ui.checkKeyUpUiControls(event);
     };
 
     ui.checkKeyUp = function(event, launcher, up, down, left, right, speed) {
@@ -680,10 +698,18 @@ function UserInterface() {
         } else if (event.keyCode == left) {
         } else if (event.keyCode == speed) {
             game.speed = 1;
-        } else if (event.keyCode == 32) {
-            game.reset();
         }
     };
+
+    ui.checkKeyUpUiControls = function (event) {
+        if (event.keyCode == 32) {
+            game.reset();
+        } else if (event.keyCode == 34) {
+            ui.scrollPuzzle(1);
+        } else if (event.keyCode == 33) {
+            ui.scrollPuzzle(-1);
+        }
+    }
 
     ui.keydown = function(event) {
         ui.checkKeyDown(event, null, 87, 83, 65, 68, 16);
