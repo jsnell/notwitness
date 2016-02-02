@@ -141,6 +141,49 @@ var puzzleSetTutorial = {
     },
 };
 
+var puzzleSetTutorial2 = {
+    tutorial2_1: {
+        rows: 5,
+        cols: 6,
+        area: [
+            { r: 1.5, c: 0.5, type: "blob", color: "black" },
+            { r: 2.5, c: 1.5, type: "blob", color: "white" },
+            { r: 1.5, c: 3.5, type: "blob", color: "green" },
+            { r: 2.5, c: 4.5, type: "blob", color: "orange" },
+        ],
+        edge: [
+        ],
+        corner: [
+            { r: 0, c: 2, type: "exit", direction: 'up', exitClass: "clone", cloneId: "tutorial2_1" },
+            { r: 4, c: 2, type: "entrance" },
+        ],
+        unlock: "tutorial2_2",
+        active: true,
+    },
+    tutorial2_2: {
+        rows: 5,
+        cols: 5,
+        area: [
+            { r: 0.5, c: 0.5, type: "blob", color: "orange" },
+            { r: 0.5, c: 3.5, type: "blob", color: "green" },
+            { r: 1.5, c: 1.5, type: "star", color: "white" },
+            { r: 2.5, c: 1.5, type: "star", color: "orange" },
+            { r: 3.5, c: 3.5, type: "blob", color: "white" },
+            { r: 2.5, c: 2.5, type: "clone", cloneId: "tutorial2_1" },
+        ],
+        edge: [
+            { r: 1.5, c: 0, type: "required", color: "black" },
+        ],
+        corner: [
+            { r: 0, c: 0, type: "exit", direction: 'up', exitClass: "clone", cloneId: "tutorial2_2" },
+            { r: 0, c: 4, type: "exit", direction: 'up', exitClass: "clone", cloneId: "tutorial2_2" },
+            { r: 4, c: 2, type: "entrance" },
+        ],
+        unlock: "tutorial2_3",
+        active: false,
+    },
+};
+
 function directionToDelta(direction) {
     var xd = 0, yd = 0;
     if (direction == 'up') {
@@ -174,7 +217,7 @@ function Game() {
     game.reset = function() {
         game.speed = 1;
         game.nextDirection = null;
-        game.failedSymbols = [];
+        game.failed = { symbols: [], edges: [] };
         game.animateState = 0;
         game.over = false;
         game.cloneOutput = null;
@@ -221,7 +264,7 @@ function Game() {
     }
 
     game.finishLevel = function(exit) {
-        game.failedSymbols = game.findFailedSymbols();
+        game.failed = game.findFailedSymbols();
         game.over = true;
         game.animateState = 0;
 
@@ -270,22 +313,29 @@ function Game() {
     };
 
     game.won = function() {
-        return game.over && game.failedSymbols.length == 0;
+        return game.over && game.failed.symbols.length == 0 &&
+            game.failed.edges.length == 0;
     };
 
     game.findFailedSymbols = function() {
         var areas = game.findSymbolsByArea();
-        var errors = [];
+        var result = { symbols: [], edges: []};
         _(areas).each(function(area) {
             _(area).each(function(symbol) {
                 symbol = normalizeSymbol(symbol);
                 if (!game.validateSymbol(symbol, area)) {
-                    errors.push(symbol);
+                    result.symbols.push(symbol);
                 }
             });
         });
-        console.log(errors);
-        return errors;
+        var lineEdges = game.lineEdges();
+        _(game.puzzle.edge).each(function(edge) {
+            if (!game.validateEdge(edge, lineEdges)) {
+                result.edges.push(edge);
+            };
+        });
+        console.log(result)
+        return result;
     }
 
     game.validateSymbol = function(symbol, area) {
@@ -301,6 +351,19 @@ function Game() {
             }).length == 2;
         } else if (symbol.type == 'none') {
             return true;
+        }
+
+        return false;
+    };
+
+    game.validateEdge = function(edge, lineEdges) {
+        console.log(edge, lineEdges);
+        if (edge.type == 'blocked') {
+            return true;
+        } else if (edge.type == 'required') {
+            return _(lineEdges).any(function (e) {
+                return e[0] == edge.c && e[1] == edge.r;
+            });
         }
 
         return false;
@@ -524,16 +587,17 @@ function Game() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
         }
 
-        game.drawSymbols(canvas, ctx, game.failedSymbols,
-                         function (symbol, ctx) {
-                             if ((game.animateState & 31) < 16) {
-                                 ctx.fillStyle = '#d44';
-                             } else {
-                                 ctx.fillStyle = symbol.color;
-                             }
-                             return true;
-                         });
-
+        function flashRed(obj, ctx) {
+            if ((game.animateState & 31) < 16) {
+                ctx.fillStyle = '#d44';
+            } else {
+                ctx.fillStyle = obj.color;
+            }
+            return true;
+        }
+        game.drawSymbols(canvas, ctx, game.failed.symbols, flashRed);
+        game.drawEdges(canvas, ctx, game.failed.edges, flashRed);
+        
         // if (game.cloneOutput) {
         //     WithContext(ctx, game.drawParams(game.cloneOutput.c,
         //                                      game.cloneOutput.r),
@@ -553,7 +617,7 @@ function Game() {
                         var color;
                         if (!game.over) {
                             color = '#eee';
-                        } else if (game.failedSymbols.length == 0) {
+                        } else if (game.won()) {
                             color = '#fff';
                             ctx.lineWidth = 2;
                         } else {
@@ -646,12 +710,8 @@ function Game() {
             return true;
         });
 
-        _(game.puzzle.edge).each(function (edge) {
-            WithContext(ctx, game.drawParams(edge.c, edge.r),
-                        function () {
-                            ctx.fillStyle = '#9080c0';
-                            ctx.fillRect(-1, -1, 2, 2);
-                        })
+        game.drawEdges(canvas, ctx, game.puzzle.edge, function (edge, ctx) {
+            return true;
         });
                        
         _(game.puzzle.corner).each(function (corner) {
@@ -689,6 +749,29 @@ function Game() {
         ctx.restore();
     }
 
+    
+    game.drawEdges = function (canvas, ctx, edges, thunk) {
+        _(edges).each(function (edge) {
+            WithContext(ctx, game.drawParams(edge.c, edge.r),
+                        function () {
+                            if (edge.color) {
+                                ctx.fillStyle = edge.color;
+                            }
+                            if (!thunk(edge, ctx)) {
+                                return;
+                            }
+                            ctx.beginPath();
+                            if (edge.type == 'blocked') {
+                                ctx.fillStyle = '#9080c0';
+                                ctx.fillRect(-1, -1, 2, 2);
+                            } else if (edge.type == 'required') {
+                                ctx.arc(0, 0, 1, 2 * Math.PI, 0);
+                                ctx.fill();
+                            }
+                        })
+        });
+    };
+    
     game.drawSymbols = function (canvas, ctx, symbols, thunk) {
         _(symbols).each(function (symbol) {
             WithContext(ctx, game.drawParams(symbol.c, symbol.r),
@@ -764,8 +847,14 @@ function UserInterface() {
     var game;
 
     ui.init = function(puzzleSet) {
+        if (game) {
+            game.pause();
+            game = null;
+            games = {};
+        }
         puzzles = puzzleSet;
-        cloneSet = {};
+        cloneState = {};
+        $('div.puzzle-selector').text('');
         ui.redraw = function() {
             var objects_canvas = document.getElementById("canvas-objects");
             var ctx = objects_canvas.getContext("2d");
@@ -926,5 +1015,10 @@ function init() {
     if (!ui) {
         ui = new UserInterface();
     }
-    ui.init(puzzleSetTutorial);
+    if (document.location.hash == '#tutorial1') {
+        ui.init(puzzleSetTutorial);
+    }
+    if (document.location.hash == '#tutorial2') {
+        ui.init(puzzleSetTutorial2);
+    }
 }

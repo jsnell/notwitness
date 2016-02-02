@@ -35,8 +35,18 @@
   </div>
   <div class='puzzle-selector'></div>
 
-  <p style="width: 250px; position: absolute; left: 550px; top: 20px;">
-    Arrow keys / WASD to steer. Hold down shift to increase speed.
-    Space to reset puzzle. Page up / page down to move between puzzles.
-  </p>
+  <div style="width: 250px; position: absolute; left: 550px; top: 20px;">
+    <p>
+      Arrow keys / WASD to steer. Hold down shift to increase speed.
+      Space to reset puzzle. Page up / page down to move between puzzles.
+    </p>
+
+    <p>
+      Select puzzle set:
+    </p>
+    <ul>
+      <li> <a href='#tutorial1' onclick='ui.init(puzzleSetTutorial)'>Tutorial 1</a>
+      <li> <a href='#tutorial2' onclick='ui.init(puzzleSetTutorial2)'>Tutorial 2</a>
+    </ul>
+  </div>
 </body>
