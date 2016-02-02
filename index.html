@@ -22,6 +22,9 @@
     div.puzzle-selector img.selected {
         background-color: #8d8;
     }
+    body {
+        overflow: hidden;
+    }
   </style>
   </head>
 <body onload='init()' onkeydown='ui.keydown(event)' onkeyup='ui.keyup(event)'>
@@ -32,7 +35,7 @@
   </div>
   <div class='puzzle-selector'></div>
 
-  <p>
+  <p style="width: 250px; position: absolute; left: 550px; top: 20px;">
     Arrow keys / WASD to steer. Hold down shift to increase speed.
     Space to reset puzzle. Page up / page down to move between puzzles.
   </p>

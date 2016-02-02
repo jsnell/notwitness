@@ -39,9 +39,9 @@ var puzzleSetTutorial = {
     },
     tutorial1: {
         rows: 3,
-        cols: 2,
+        cols: 3,
         area: [
-            { r: 1.5, c: 0.5, type: "blob", color: "black" },
+            { r: 0.5, c: 0.5, type: "blob", color: "black" },
         ],
         edge: [
         ],
@@ -243,7 +243,7 @@ function Game() {
     }
 
     game.findCloneSource = function() {
-        var result = {};
+        var result = { type: "none" };
         _(game.lineEdges()).each(function(edge) {
             var symbols = game.symbolsTouchingEdge(edge);
             if (symbols.length == 1) {
@@ -278,18 +278,17 @@ function Game() {
         var errors = [];
         _(areas).each(function(area) {
             _(area).each(function(symbol) {
+                symbol = normalizeSymbol(symbol);
                 if (!game.validateSymbol(symbol, area)) {
                     errors.push(symbol);
                 }
             });
         });
-
+        console.log(errors);
         return errors;
     }
 
     game.validateSymbol = function(symbol, area) {
-        symbol = normalizeSymbol(symbol);
-
         if (symbol.type == 'blob') {
             return !area.find(function (other) {
                 other = normalizeSymbol(other);
@@ -694,6 +693,16 @@ function Game() {
         _(symbols).each(function (symbol) {
             WithContext(ctx, game.drawParams(symbol.c, symbol.r),
                         function () {
+                            if (symbol.type == 'clone') {
+                                ctx.save();
+                                ctx.beginPath();
+                                ctx.lineWidth = 1;
+                                ctx.strokeStyle = '#da8';
+                                ctx.arc(0, 0, 3, 0, 1 * Math.PI);
+                                ctx.stroke();
+                                ctx.restore();
+                            }
+
                             symbol = normalizeSymbol(symbol);
                             
                             if (!thunk(symbol, ctx)) {
@@ -720,11 +729,11 @@ function Game() {
                                 ctx.fillRect(-2, -1, 4, 2);
                                 ctx.fillRect(-1, -2, 2, 4);
                             } else if (symbol.type == "none") {
-                                ctx.beginPath();
-                                ctx.lineWidth = 1;
-                                ctx.strokeStyle = '#da8';
-                                ctx.arc(0, 0, 2, 0, 1*Math.PI);
-                                ctx.stroke();
+                                // ctx.beginPath();
+                                // ctx.lineWidth = 1;
+                                // ctx.strokeStyle = '#da8';
+                                // ctx.arc(0, 0, 2, 0, 1*Math.PI);
+                                // ctx.stroke();
                             } else if (symbol.type == "star") {
                                 ctx.beginPath();
                                 ctx.arc(0, 0, 1, 2*Math.PI, 0);
