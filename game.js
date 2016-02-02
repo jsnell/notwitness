@@ -1,4 +1,3 @@
-var game;
 var ui;
 
 function WithContext(ctx, params, fun) {
@@ -19,7 +18,25 @@ function WithContext(ctx, params, fun) {
     }
 }
 
-var puzzles = {
+var cloneState = {
+};
+
+var puzzleSetTutorial = {
+    tutorial0: {
+        rows: 3,
+        cols: 2,
+        area: [
+            { r: 1.5, c: 0.5, type: "blob", color: "white" },
+        ],
+        edge: [
+        ],
+        corner: [
+            { r: 0, c: 1, type: "exit", direction: 'up' },
+            { r: 2, c: 0, type: "entrance" },
+        ],
+        unlock: "tutorial1",
+        active: true,
+    },
     tutorial1: {
         rows: 3,
         cols: 2,
@@ -29,11 +46,11 @@ var puzzles = {
         edge: [
         ],
         corner: [
-            { r: 0, c: 1, type: "exit", direction: 'up' },
+            { r: 0, c: 1, type: "exit", direction: 'up', exitClass: "clone", cloneId: "tutorial1" },
             { r: 2, c: 0, type: "entrance" },
         ],
         unlock: "tutorial2",
-        active: true,
+        active: false,
     },
     tutorial2: {
         rows: 3,
@@ -41,12 +58,12 @@ var puzzles = {
         area: [
             { r: 0.5, c: 0.5, type: "blob", color: "white" },
             { r: 1.5, c: 0.5, type: "blob", color: "white" },
-            { r: 1.5, c: 2.5, type: "blob", color: "black" },
+            { r: 1.5, c: 2.5, type: "clone", cloneId: "tutorial1" },
         ],
         edge: [
         ],
         corner: [
-            { r: 0, c: 1, type: "exit", direction: 'up' },
+            { r: 0, c: 1, type: "exit", direction: 'up', exitClass: "clone", cloneId: "tutorial2" },
             { r: 2, c: 1, type: "entrance" },
         ],
         unlock: "tutorial3",
@@ -56,21 +73,72 @@ var puzzles = {
         rows: 3,
         cols: 3,
         area: [
-            { r: 0.5, c: 0.5, type: "blob", color: "white" },
-            // { r: 0.5, c: 1.5, type: "inherit", id: "tutorial2" },
-            { r: 0.5, c: 1.5, type: "blob", id: "black" },
-            { r: 1.5, c: 0.5, type: "blob", color: "white" },
-            { r: 1.5, c: 1.5, type: "blob", color: "black" },
+            { r: 0.5, c: 0.5, type: "clone", cloneId: "tutorial2" },
+            { r: 0.5, c: 1.5, type: "blob", color: "black" },
+            { r: 1.5, c: 0.5, type: "blob", color: "black" },
+            { r: 1.5, c: 1.5, type: "blob", color: "white" },
         ],
         edge: [
+        ],
+        corner: [
+            { r: 0, c: 1, type: "exit", direction: 'up', exitClass: "clone", cloneId: "tutorial3" },
+            { r: 2, c: 1, type: "entrance" },
+        ],
+        unlock: "tutorial4",
+        active: false,
+    },
+    tutorial4: {
+        rows: 3,
+        cols: 3,
+        area: [
+            { r: 1.5, c: 0.5, type: "clone", cloneId: "tutorial3" },
+            { r: 1.5, c: 1.5, type: "blob", color: "white" },
+        ],
+        edge: [
+        ],
+        corner: [
+            { r: 0, c: 1, type: "exit", direction: 'up',
+              exitClass: "clone", cloneId: "tutorial4" },
+            { r: 2, c: 1, type: "entrance" },
+        ],
+        unlock: "tutorial5",
+        active: false,
+    },
+    tutorial5: {
+        rows: 3,
+        cols: 3,
+        area: [
+            { r: 0.5, c: 1.5, type: "clone", cloneId: "tutorial4" },
+            { r: 0.5, c: 0.5, type: "star", color: "white" },
+        ],
+        edge: [
+        ],
+        corner: [
+            { r: 0, c: 1, type: "exit", direction: 'up',
+              exitClass: "clone", cloneId: "tutorial5" },
+            { r: 0, c: 0, type: "exit", direction: 'up' },
+            { r: 2, c: 1, type: "entrance" },
+        ],
+        unlock: "tutorial6",
+        active: false,
+    },
+    tutorial6: {
+        rows: 3,
+        cols: 3,
+        area: [
+            { r: 1.5, c: 1.5, type: "clone", cloneId: "tutorial5" },
+            { r: 1.5, c: 0.5, type: "star", color: "white" },
+            { r: 0.5, c: 1.5, type: "star", color: "white" },
+        ],
+        edge: [
+            { r: 1, c: 1.5, type: "blocked" },            
         ],
         corner: [
             { r: 0, c: 1, type: "exit", direction: 'up' },
             { r: 2, c: 1, type: "entrance" },
         ],
-        unlock: "tutorial4",
         active: false,
-    }
+    },
 };
 
 function directionToDelta(direction) {
@@ -109,6 +177,8 @@ function Game() {
         game.failedSymbols = [];
         game.animateState = 0;
         game.over = false;
+        game.cloneOutput = null;
+
         line = {
             segments: [],
             next: null,
@@ -150,15 +220,54 @@ function Game() {
         }
     }
 
-    game.finishLevel = function() {
+    game.finishLevel = function(exit) {
         game.failedSymbols = game.findFailedSymbols();
         game.over = true;
         game.animateState = 0;
+
+        if (game.won()) {
+            _(game.puzzle.corner).each(function (corner) {
+                if (corner.type == "exit" &&
+                    corner.exitClass == 'clone') {
+                    cloneState[corner.cloneId] =  { type: "none" }
+                }
+            });
+            if (exit.exitClass == 'clone') {
+                cloneState[exit.cloneId] = game.cloneOutput = game.findCloneSource();
+            }
+        }
 
         if (gameOverCallback) {
             gameOverCallback();
         }
     }
+
+    game.findCloneSource = function() {
+        var result = {};
+        _(game.lineEdges()).each(function(edge) {
+            var symbols = game.symbolsTouchingEdge(edge);
+            if (symbols.length == 1) {
+                result = normalizeSymbol(symbols[0]);
+            } else if (symbols.length > 1) {
+                result = { type: "none" }
+            }
+        });
+        return result;
+    };
+
+    game.symbolsTouchingEdge = function(edge) {
+        var symbols = [];
+        _(game.puzzle.area).each(function (symbol) {
+            if ((symbol.c == edge[0] && symbol.r == edge[1] + 0.5)  ||
+                (symbol.c == edge[0] && symbol.r == edge[1] - 0.5)  ||
+                (symbol.c == edge[0] + 0.5 && symbol.r == edge[1])  ||
+                (symbol.c == edge[0] - 0.5 && symbol.r == edge[1])) {
+                symbols.push(symbol);
+            }
+        });
+
+        return symbols;
+    };
 
     game.won = function() {
         return game.over && game.failedSymbols.length == 0;
@@ -179,25 +288,50 @@ function Game() {
     }
 
     game.validateSymbol = function(symbol, area) {
+        symbol = normalizeSymbol(symbol);
+
         if (symbol.type == 'blob') {
             return !area.find(function (other) {
+                other = normalizeSymbol(other);
                 return other.type == 'blob' && other.color != symbol.color;
             });
+        } else if (symbol.type == 'star') {
+            return area.filter(function (other) {
+                other = normalizeSymbol(other);
+                return other.color == symbol.color;
+            }).length == 2;
+        } else if (symbol.type == 'none') {
+            return true;
         }
 
         return false;
     };
 
-    game.findSymbolsByArea = function() {
-        var edges = {};
+    function normalizeSymbol(symbol) {       
+        if (symbol.type == 'clone') {
+            return cloneState[symbol.cloneId];
+        }
+        return symbol;
+    }
+
+    game.lineEdges = function() {
+        var edges = []
         var prev = null;
         _(line.segments).each(function(seg) {
             if (prev != null) {
                 var c = (seg[0] + prev[0]) / 2;
                 var r = (seg[1] + prev[1]) / 2;
-                edges[[c, r]] = true;
+                edges.push([c, r]);
             }
             prev = seg;
+        });
+        return edges;
+    }
+    
+    game.findSymbolsByArea = function() {
+        var edges = {}
+        _(game.lineEdges()).each(function(elem) {
+            edges[elem] = true;
         });
 
         var areas = [];
@@ -268,7 +402,7 @@ function Game() {
                 line.next.progress < line.next.maxProgress) {
                 line.next.progress += scale * 0.02 * line.next.sign;
             } else if (line.next.exit) {
-                game.finishLevel();
+                game.finishLevel(line.next.exit);
             }
 
             if (line.next.progress <= 0) {
@@ -364,7 +498,7 @@ function Game() {
             maxProgress: maxProgress,
             direction: direction,
             reverseDirection: reverseDirection,
-            exit: (exit != null),
+            exit: exit ? exit[2] : null,
             sign: 1
         };
     };
@@ -382,7 +516,7 @@ function Game() {
 
         if (exit) {
             var d = directionToDelta(direction);
-            return [ exit.c + d[0], exit.r + d[1] ]
+            return [ exit.c + d[0], exit.r + d[1], exit ]
         }
     }
 
@@ -400,6 +534,18 @@ function Game() {
                              }
                              return true;
                          });
+
+        // if (game.cloneOutput) {
+        //     WithContext(ctx, game.drawParams(game.cloneOutput.c,
+        //                                      game.cloneOutput.r),
+        //                 function () {
+        //                     ctx.beginPath();
+        //                     ctx.lineWidth = 1;
+        //                     ctx.strokeStyle = '#da8';
+        //                     ctx.arc(0, 0, 3, 1 * Math.PI, 0);
+        //                     ctx.stroke();
+        //                 });
+        // }
         
         WithContext(ctx, game.drawParams(0, 0),
                     function () {
@@ -529,6 +675,14 @@ function Game() {
                                 ctx.beginPath();
                                 ctx.arc(x, y, 1, 2*Math.PI, 0);
                                 ctx.fill();
+
+                                if (corner.exitClass == 'clone') {
+                                    ctx.beginPath();
+                                    ctx.lineWidth = 1;
+                                    ctx.strokeStyle = '#da8';
+                                    ctx.arc(x, y, 2, 1*Math.PI, 0);
+                                    ctx.stroke();
+                                }
                             }
                         });
         });
@@ -540,9 +694,12 @@ function Game() {
         _(symbols).each(function (symbol) {
             WithContext(ctx, game.drawParams(symbol.c, symbol.r),
                         function () {
+                            symbol = normalizeSymbol(symbol);
+                            
                             if (!thunk(symbol, ctx)) {
                                 return;
                             }
+                            
                             if (symbol.type == "blob") {
                                 ctx.beginPath();
                                 ctx.arc(-1, -1, 1, 2*Math.PI, 0);
@@ -562,6 +719,27 @@ function Game() {
 
                                 ctx.fillRect(-2, -1, 4, 2);
                                 ctx.fillRect(-1, -2, 2, 4);
+                            } else if (symbol.type == "none") {
+                                ctx.beginPath();
+                                ctx.lineWidth = 1;
+                                ctx.strokeStyle = '#da8';
+                                ctx.arc(0, 0, 2, 0, 1*Math.PI);
+                                ctx.stroke();
+                            } else if (symbol.type == "star") {
+                                ctx.beginPath();
+                                ctx.arc(0, 0, 1, 2*Math.PI, 0);
+                                ctx.fill();
+
+                                ctx.beginPath();
+                                ctx.moveTo(2, 0);
+                                for (var i = 0; i < 8; ++i) {
+                                    ctx.rotate(2 * Math.PI / 16);
+                                    ctx.lineTo(3, 0);
+                                    ctx.rotate(2 * Math.PI / 16);
+                                    ctx.lineTo(2, 0);
+                                }
+                                ctx.closePath();
+                                ctx.fill();
                             }
                         })
         });
@@ -572,10 +750,13 @@ function UserInterface() {
     var ui = this;
     var games = {};
     var screenshots = {};
+    var puzzles;
     var puzzleNames;
     var game;
 
-    ui.init = function(puzzleName) {            
+    ui.init = function(puzzleSet) {
+        puzzles = puzzleSet;
+        cloneSet = {};
         ui.redraw = function() {
             var objects_canvas = document.getElementById("canvas-objects");
             var ctx = objects_canvas.getContext("2d");
@@ -596,6 +777,7 @@ function UserInterface() {
         _(puzzleNames).each(function(name) {
             ui.initScreenshot(name);
         });
+        puzzleName = puzzleNames[0];
         ui.switchToPuzzle(puzzleName);
     };
 
@@ -735,5 +917,5 @@ function init() {
     if (!ui) {
         ui = new UserInterface();
     }
-    ui.init('tutorial1');
+    ui.init(puzzleSetTutorial);
 }
