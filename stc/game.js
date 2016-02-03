@@ -327,7 +327,6 @@ var puzzleSetFinale = {
             { r: 0, c: 3, type: "exit", direction: 'up' },
             { r: 6, c: 3, type: "entrance" },
         ],
-        unlock: "finale4",
         active: false,
     },
 };
@@ -950,7 +949,6 @@ function Game() {
     };
 
     function cloneSymbolAngle(cloneId) {
-        console.log(cloneId, game.puzzle.cloneIdAngles);
         return game.puzzle.cloneIdAngles[cloneId];
     }
 
@@ -1044,7 +1042,6 @@ function UserInterface() {
         }
         puzzles = puzzleSet;
         cloneState = {};
-        $('div.puzzle-selector').text('');
         ui.redraw = function() {
             var objects_canvas = document.getElementById("canvas-objects");
             var ctx = objects_canvas.getContext("2d");
@@ -1079,15 +1076,31 @@ function UserInterface() {
         _(puzzles).each(function(puzzle) {
             puzzle.cloneIdAngles = cloneIdAngles;
         });
-         
-        _(puzzleNames).each(function(name) {
-            ui.initScreenshot(name);
-        });
-        puzzleName = puzzleNames[0];
-        puzzles[puzzleNames[0]].active = true;
-        ui.switchToPuzzle(puzzleName);
+        
+        return ui;
     };
 
+    ui.enable = function() {
+        $('div.puzzle-selector').text("");
+        _(puzzleNames).each(function(name) {
+            var g = ui.ensureGame(name);
+            ui.updateScreenshot(g);
+        });
+        if (game) {
+            ui.switchToPuzzle(game.puzzle.name);
+        } else {
+            puzzleName = puzzleNames[0];
+            puzzles[puzzleNames[0]].active = true;
+            ui.switchToPuzzle(puzzleName);
+        }
+    };
+
+    ui.disable = function() {
+        if (game) {
+            game.pause();
+        }
+    };                               
+    
     ui.ensureGame = function(puzzleName) {
         var game = games[puzzleName];
         if (!game) {
@@ -1168,9 +1181,11 @@ function UserInterface() {
         var ctx = canvas_ss.getContext("2d");
         ctx.clearRect(0, 0, canvas_ss.width, canvas_ss.height);
 
-        game.drawBase(canvas_ss, ctx);
-        game.draw(canvas_ss, ctx, true);
-        img.src = canvas_ss.toDataURL();
+        if (game.puzzle.active) {
+            game.drawBase(canvas_ss, ctx);
+            game.draw(canvas_ss, ctx, true);
+            img.src = canvas_ss.toDataURL();
+        }
 
         img.onclick = function() {
             ui.switchToPuzzle(game.puzzle.name);
@@ -1234,17 +1249,18 @@ function UserInterface() {
     };
 }
 
+var uis = {};
+
+function switchToSet(name) {
+    if (ui) {
+        ui.disable();
+    }
+    ui = uis[name];
+    ui.enable();
+}
+
 function init() {
-    if (!ui) {
-        ui = new UserInterface();
-    }
-    if (document.location.hash == '#tutorial') {
-        ui.init(puzzleSetTutorial);
-    }
-    if (document.location.hash == '#twist') {
-        ui.init(puzzleSetTwist);
-    }
-    if (document.location.hash == '#finale') {
-        ui.init(puzzleSetFinale);
-    }
+    uis['#tutorial'] = new UserInterface().init(puzzleSetTutorial);
+    uis['#twist'] = new UserInterface().init(puzzleSetTwist);
+    uis['#finale'] = new UserInterface().init(puzzleSetFinale);
 }
