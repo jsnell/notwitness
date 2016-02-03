@@ -242,8 +242,8 @@ var puzzleSetFinale = {
         edge: [
         ],
         corner: [
-            { r: 0, c: 2, type: "exit", direction: 'up', exitClass: "clone", cloneId: "finale1" },
-            { r: 4, c: 2, type: "entrance" },
+            { r: 0, c: 5, type: "exit", direction: 'up', exitClass: "clone", cloneId: "finale1" },
+            { r: 4, c: 0, type: "entrance" },
         ],
         unlock: "finale2",
         active: true,
