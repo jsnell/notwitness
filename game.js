@@ -230,36 +230,6 @@ var puzzleSetTwist = {
 };
 
 var puzzleSetFinale = {
-    finale3: {
-        rows: 6,
-        cols: 6,
-        area: [
-            { r: 0.5, c: 0.5, type: "star", color: "orange" },
-            { r: 0.5, c: 4.5, type: "star", color: "green" },
-            { r: 4.5, c: 0.5, type: "star", color: "black" },
-            { r: 4.5, c: 4.5, type: "star", color: "white" },
-            // { r: 3.5, c: 2.5, type: "blob", color: "white" },
-            { r: 4.5, c: 2.5, type: "blob", color: "black" },
-            { r: 1.5, c: 4.5, type: "blob", color: "green" },
-            { r: 3.5, c: 4.5, type: "blob", color: "white" },
-            { r: 0.5, c: 2.5, type: "blob", color: "orange" },
-            // orange / green
-            { r: 2.5, c: 0.5, type: "blob", color: "orange" },
-            { r: 2.5, c: 4.5, type: "blob", color: "orange" },            
-        ],
-        edge: [
-            { r: 1.5, c: 0, type: "required", color: "black" },
-        ],
-        corner: [
-            { r: 0, c: 0, type: "exit", direction: 'up', exitClass: "clone", cloneId: "finale3" },
-            { r: 0, c: 5, type: "exit", direction: 'up', exitClass: "clone", cloneId: "finale3" },
-            { r: 5, c: 0, type: "exit", direction: 'down', exitClass: "clone", cloneId: "finale3" },
-            { r: 5, c: 5, type: "exit", direction: 'down', exitClass: "clone", cloneId: "finale3" },
-            { r: 5, c: 2, type: "entrance" },
-        ],
-        unlock: "finale3",
-        active: true,
-    },
     finale1: {
         rows: 5,
         cols: 6,
@@ -298,6 +268,36 @@ var puzzleSetFinale = {
             { r: 4, c: 2, type: "entrance" },
         ],
         unlock: "finale3",
+        active: false,
+    },
+    finale3: {
+        rows: 7,
+        cols: 7,
+        area: [
+            { r: 0.5, c: 0.5, type: "star", color: "white" },
+            { r: 1.5, c: 3.5, type: "blob", color: "white" },
+            { r: 0.5, c: 4.5, type: "blob", color: "orange" },
+            { r: 0.5, c: 5.5, type: "blob", color: "green" },
+            { r: 5.5, c: 5.5, type: "blob", color: "green" },
+            { r: 1.5, c: 0.5, type: "blob", color: "orange" },
+            { r: 5.5, c: 4.5, type: "blob", color: "orange" },
+            { r: 3.5, c: 0.5, type: "blob", color: "green" },
+            { r: 5.5, c: 0.5, type: "blob", color: "black" },
+            { r: 5.5, c: 2.5, type: "blob", color: "black" },
+            // orange / green blob
+            { r: 3.5, c: 4.5, type: "clone", cloneId: "finale2" },            
+            // { r: 3.5, c: 4.5, type: "blob", color: "orange" },
+            // { r: 3.5, c: 4.5, type: "blob", color: "green" },
+        ],
+        edge: [
+            { r: 1, c: 3.5, type: "blocked" },
+            { r: 4, c: 4.5, type: "blocked" },
+        ],
+        corner: [
+            { r: 0, c: 3, type: "exit", direction: 'up', exitClass: "clone", cloneId: "finale3" },
+            { r: 6, c: 3, type: "entrance" },
+        ],
+        unlock: "finale4",
         active: false,
     },
 };
