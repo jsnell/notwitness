@@ -39,9 +39,10 @@ var puzzleSetTutorial = {
     },
     tutorial1: {
         rows: 3,
-        cols: 3,
+        cols: 4,
         area: [
-            { r: 0.5, c: 0.5, type: "blob", color: "black" },
+            { r: 1.5, c: 0.5, type: "blob", color: "white" },
+            { r: 0.5, c: 2.5, type: "clone", cloneId: 'tutorial1' },
         ],
         edge: [
         ],
@@ -53,27 +54,114 @@ var puzzleSetTutorial = {
         active: false,
     },
     tutorial2: {
-        rows: 3,
-        cols: 4,
+        rows: 4,
+        cols: 6,
         area: [
-            { r: 0.5, c: 0.5, type: "blob", color: "white" },
             { r: 1.5, c: 0.5, type: "blob", color: "white" },
-            { r: 1.5, c: 2.5, type: "clone", cloneId: "tutorial1" },
+            { r: 1.5, c: 4.5, type: "blob", color: "orange" },
+            { r: 1.5, c: 2.5, type: "blob", color: "black" },
+            { r: 2.5, c: 0.5, type: "clone", cloneId: 'tutorial2' },
         ],
         edge: [
         ],
         corner: [
-            { r: 0, c: 1, type: "exit", direction: 'up', exitClass: "clone", cloneId: "tutorial2" },
-            { r: 2, c: 1, type: "entrance" },
+            { r: 0, c: 0, type: "exit", direction: 'up', exitClass: "clone", cloneId: "tutorial2" },
+            { r: 3, c: 2, type: "entrance" },
         ],
         unlock: "tutorial3",
         active: false,
     },
     tutorial3: {
+        rows: 4,
+        cols: 3,
+        area: [
+            { r: 1.5, c: 0.5, type: "star", color: "white" },
+            { r: 1.5, c: 1.5, type: "star", color: "white" },
+            { r: 2.5, c: 0.5, type: "clone", cloneId: 'tutorial3' },
+        ],
+        edge: [
+        ],
+        corner: [
+            { r: 0, c: 0, type: "exit", direction: 'up', exitClass: "clone", cloneId: "tutorial3" },
+            { r: 0, c: 2, type: "exit", direction: 'up' },
+            { r: 3, c: 0, type: "entrance" },
+        ],
+        unlock: "tutorial4",
+        active: false,
+    },
+    tutorial4: {
+        rows: 4,
+        cols: 3,
+        area: [
+            { r: 1.5, c: 0.5, type: "star", color: "white" },
+            { r: 1.5, c: 1.5, type: "blob", color: "black" },
+            { r: 2.5, c: 0.5, type: "clone", cloneId: 'tutorial4' },
+        ],
+        edge: [
+        ],
+        corner: [
+            { r: 0, c: 1, type: "exit", direction: 'up', exitClass: "clone", cloneId: "tutorial4" },
+            { r: 3, c: 1, type: "entrance" },
+        ],
+        unlock: "tutorial5",
+        active: false,
+    },
+    tutorial5: {
+        rows: 5,
+        cols: 4,
+        area: [
+            { r: 2.5, c: 0.5, type: "star", color: "white" },
+            { r: 2.5, c: 2.5, type: "star", color: "white" },
+            { r: 0.5, c: 0.5, type: "clone", cloneId: 'tutorial5' },
+        ],
+        edge: [
+        ],
+        corner: [
+            { r: 0, c: 2, type: "exit", direction: 'up', exitClass: "clone", cloneId: "tutorial5" },
+            { r: 4, c: 2, type: "entrance" },
+        ],
+        active: false,
+    },
+};
+
+var puzzleSetTwist = {
+    twist1: {
         rows: 3,
         cols: 3,
         area: [
-            { r: 0.5, c: 0.5, type: "clone", cloneId: "tutorial2" },
+            { r: 0.5, c: 0.5, type: "blob", color: "black" },
+        ],
+        edge: [
+        ],
+        corner: [
+            { r: 0, c: 1, type: "exit", direction: 'up', exitClass: "clone", cloneId: "twist1" },
+            { r: 2, c: 0, type: "entrance" },
+        ],
+        unlock: "twist2",
+        active: true,
+    },
+    twist2: {
+        rows: 3,
+        cols: 4,
+        area: [
+            { r: 0.5, c: 0.5, type: "blob", color: "white" },
+            { r: 1.5, c: 0.5, type: "blob", color: "white" },
+            { r: 1.5, c: 2.5, type: "clone", cloneId: "twist1" },
+        ],
+        edge: [
+        ],
+        corner: [
+            { r: 0, c: 1, type: "exit", direction: 'up', exitClass: "clone", cloneId: "twist2" },
+            { r: 2, c: 1, type: "entrance" },
+        ],
+        unlock: "twist3",
+        active: false,
+    },
+    twist3: {
+        rows: 3,
+        cols: 3,
+        area: [
+            { r: 0.5, c: 0.5, type: "clone", cloneId: "twist2" },
             { r: 0.5, c: 1.5, type: "blob", color: "black" },
             { r: 1.5, c: 0.5, type: "blob", color: "black" },
             { r: 1.5, c: 1.5, type: "blob", color: "white" },
@@ -81,52 +169,52 @@ var puzzleSetTutorial = {
         edge: [
         ],
         corner: [
-            { r: 0, c: 1, type: "exit", direction: 'up', exitClass: "clone", cloneId: "tutorial3" },
+            { r: 0, c: 1, type: "exit", direction: 'up', exitClass: "clone", cloneId: "twist3" },
             { r: 2, c: 1, type: "entrance" },
         ],
-        unlock: "tutorial4",
+        unlock: "twist4",
         active: false,
     },
-    tutorial4: {
+    twist4: {
         rows: 3,
         cols: 3,
         area: [
-            { r: 1.5, c: 0.5, type: "clone", cloneId: "tutorial3" },
+            { r: 1.5, c: 0.5, type: "clone", cloneId: "twist3" },
             { r: 1.5, c: 1.5, type: "blob", color: "white" },
         ],
         edge: [
         ],
         corner: [
             { r: 0, c: 1, type: "exit", direction: 'up',
-              exitClass: "clone", cloneId: "tutorial4" },
+              exitClass: "clone", cloneId: "twist4" },
             { r: 2, c: 1, type: "entrance" },
         ],
-        unlock: "tutorial5",
+        unlock: "twist5",
         active: false,
     },
-    tutorial5: {
+    twist5: {
         rows: 3,
         cols: 3,
         area: [
-            { r: 0.5, c: 1.5, type: "clone", cloneId: "tutorial4" },
+            { r: 0.5, c: 1.5, type: "clone", cloneId: "twist4" },
             { r: 0.5, c: 0.5, type: "star", color: "white" },
         ],
         edge: [
         ],
         corner: [
-            { r: 0, c: 1, type: "exit", direction: 'up',
-              exitClass: "clone", cloneId: "tutorial5" },
-            { r: 0, c: 0, type: "exit", direction: 'up' },
+            { r: 0, c: 0, type: "exit", direction: 'up',
+              exitClass: "clone", cloneId: "twist5" },
+            { r: 0, c: 1, type: "exit", direction: 'up' },
             { r: 2, c: 1, type: "entrance" },
         ],
-        unlock: "tutorial6",
+        unlock: "twist6",
         active: false,
     },
-    tutorial6: {
+    twist6: {
         rows: 3,
         cols: 3,
         area: [
-            { r: 1.5, c: 1.5, type: "clone", cloneId: "tutorial5" },
+            { r: 1.5, c: 1.5, type: "clone", cloneId: "twist5" },
             { r: 1.5, c: 0.5, type: "star", color: "white" },
             { r: 0.5, c: 1.5, type: "star", color: "white" },
         ],
@@ -141,8 +229,38 @@ var puzzleSetTutorial = {
     },
 };
 
-var puzzleSetTutorial2 = {
-    tutorial2_1: {
+var puzzleSetFinale = {
+    finale3: {
+        rows: 6,
+        cols: 6,
+        area: [
+            { r: 0.5, c: 0.5, type: "star", color: "orange" },
+            { r: 0.5, c: 4.5, type: "star", color: "green" },
+            { r: 4.5, c: 0.5, type: "star", color: "black" },
+            { r: 4.5, c: 4.5, type: "star", color: "white" },
+            // { r: 3.5, c: 2.5, type: "blob", color: "white" },
+            { r: 4.5, c: 2.5, type: "blob", color: "black" },
+            { r: 1.5, c: 4.5, type: "blob", color: "green" },
+            { r: 3.5, c: 4.5, type: "blob", color: "white" },
+            { r: 0.5, c: 2.5, type: "blob", color: "orange" },
+            // orange / green
+            { r: 2.5, c: 0.5, type: "blob", color: "orange" },
+            { r: 2.5, c: 4.5, type: "blob", color: "orange" },            
+        ],
+        edge: [
+            { r: 1.5, c: 0, type: "required", color: "black" },
+        ],
+        corner: [
+            { r: 0, c: 0, type: "exit", direction: 'up', exitClass: "clone", cloneId: "finale3" },
+            { r: 0, c: 5, type: "exit", direction: 'up', exitClass: "clone", cloneId: "finale3" },
+            { r: 5, c: 0, type: "exit", direction: 'down', exitClass: "clone", cloneId: "finale3" },
+            { r: 5, c: 5, type: "exit", direction: 'down', exitClass: "clone", cloneId: "finale3" },
+            { r: 5, c: 2, type: "entrance" },
+        ],
+        unlock: "finale3",
+        active: true,
+    },
+    finale1: {
         rows: 5,
         cols: 6,
         area: [
@@ -154,13 +272,13 @@ var puzzleSetTutorial2 = {
         edge: [
         ],
         corner: [
-            { r: 0, c: 2, type: "exit", direction: 'up', exitClass: "clone", cloneId: "tutorial2_1" },
+            { r: 0, c: 2, type: "exit", direction: 'up', exitClass: "clone", cloneId: "finale1" },
             { r: 4, c: 2, type: "entrance" },
         ],
-        unlock: "tutorial2_2",
+        unlock: "finale2",
         active: true,
     },
-    tutorial2_2: {
+    finale2: {
         rows: 5,
         cols: 5,
         area: [
@@ -169,17 +287,17 @@ var puzzleSetTutorial2 = {
             { r: 1.5, c: 1.5, type: "star", color: "white" },
             { r: 2.5, c: 1.5, type: "star", color: "orange" },
             { r: 3.5, c: 3.5, type: "blob", color: "white" },
-            { r: 2.5, c: 2.5, type: "clone", cloneId: "tutorial2_1" },
+            { r: 2.5, c: 2.5, type: "clone", cloneId: "finale1" },
         ],
         edge: [
             { r: 1.5, c: 0, type: "required", color: "black" },
         ],
         corner: [
-            { r: 0, c: 0, type: "exit", direction: 'up', exitClass: "clone", cloneId: "tutorial2_2" },
-            { r: 0, c: 4, type: "exit", direction: 'up', exitClass: "clone", cloneId: "tutorial2_2" },
+            { r: 0, c: 0, type: "exit", direction: 'up', exitClass: "clone", cloneId: "finale2" },
+            { r: 0, c: 4, type: "exit", direction: 'up', exitClass: "clone", cloneId: "finale2" },
             { r: 4, c: 2, type: "entrance" },
         ],
-        unlock: "tutorial2_3",
+        unlock: "finale3",
         active: false,
     },
 };
@@ -205,6 +323,7 @@ function Game() {
     var updateAndDraw;
     var gameOverCallback;
     var timer;
+    var localCloneState;
     
     game.init = function(puzzle, update_cb, game_over_cb) {
         game.puzzle = puzzle;
@@ -221,6 +340,7 @@ function Game() {
         game.animateState = 0;
         game.over = false;
         game.cloneOutput = null;
+        localCloneState = {};
 
         line = {
             segments: [],
@@ -230,6 +350,10 @@ function Game() {
         _(game.puzzle.corner).each(function (corner) {
             if (corner.type == 'entrance') {
                 line.segments.push([corner.c, corner.r]);
+            }
+            if (corner.type == "exit" &&
+                corner.exitClass == 'clone') {
+                localCloneState[corner.cloneId] =  { type: "none" }
             }
         });
     }
@@ -264,11 +388,22 @@ function Game() {
     }
 
     game.finishLevel = function(exit) {
+        // Set the puzzle-local clone state to the the state this colution
+        // would have.
+        if (exit.exitClass == 'clone') {
+            localCloneState[exit.cloneId] = game.cloneOutput = game.findCloneSource();
+        }
+
+        // Then check whether the puzzle passes with that substitution.
         game.failed = game.findFailedSymbols();
         game.over = true;
         game.animateState = 0;
 
         if (game.won()) {
+            // Finally clear out the local state for all unused clone
+            // exits, and set it for the one actually used one. (N.B.
+            // the concept of a single exit is wrong with symmetry
+            // puzzles).
             _(game.puzzle.corner).each(function (corner) {
                 if (corner.type == "exit" &&
                     corner.exitClass == 'clone') {
@@ -334,7 +469,6 @@ function Game() {
                 result.edges.push(edge);
             };
         });
-        console.log(result)
         return result;
     }
 
@@ -371,7 +505,16 @@ function Game() {
 
     function normalizeSymbol(symbol) {       
         if (symbol.type == 'clone') {
-            return cloneState[symbol.cloneId];
+            var ret;
+            if (localCloneState[symbol.cloneId]) {
+                ret = localCloneState[symbol.cloneId]
+            } else if (cloneState[symbol.cloneId]) {
+                ret = cloneState[symbol.cloneId];
+            } else {
+                ret = { type: 'none' }
+            }
+            console.log(symbol, ret, cloneState, localCloneState);
+            return $.extend({ r: symbol.r, c: symbol.c}, ret);
         }
         return symbol;
     }
@@ -705,8 +848,10 @@ function Game() {
             }
         }
 
+        console.log(localCloneState, cloneState);
         game.drawSymbols(canvas, ctx, game.puzzle.area, function (symbol, ctx) {
             ctx.fillStyle = symbol.color;
+            console.log("draw ", symbol);
             return true;
         });
 
@@ -876,6 +1021,7 @@ function UserInterface() {
             ui.initScreenshot(name);
         });
         puzzleName = puzzleNames[0];
+        puzzles[puzzleNames[0]].active = true;
         ui.switchToPuzzle(puzzleName);
     };
 
@@ -888,6 +1034,9 @@ function UserInterface() {
                       ui.updateAndDraw,
                       function () {
                           ui.updateScreenshot(game);
+                          var map_canvas = document.getElementById("canvas-map");
+                          game.drawBase(map_canvas,
+                                        map_canvas.getContext("2d"));
                           if (game.won() && game.puzzle.unlock) {
                               var unlocked = puzzles[game.puzzle.unlock];
                               unlocked.active = true;
@@ -910,6 +1059,13 @@ function UserInterface() {
         var puzzleName = puzzleNames[i2];
 
         ui.switchToPuzzle(puzzleName);
+    }
+
+    ui.resetPuzzle = function() {
+        game.reset();
+        var map_canvas = document.getElementById("canvas-map");
+        game.drawBase(map_canvas,
+                      map_canvas.getContext("2d"));
     }
 
     ui.switchToPuzzle = function(puzzleName) {
@@ -983,7 +1139,7 @@ function UserInterface() {
 
     ui.checkKeyUpUiControls = function (event) {
         if (event.keyCode == 32) {
-            game.reset();
+            ui.resetPuzzle();
         } else if (event.keyCode == 34) {
             ui.scrollPuzzle(1);
         } else if (event.keyCode == 33) {
@@ -1015,10 +1171,13 @@ function init() {
     if (!ui) {
         ui = new UserInterface();
     }
-    if (document.location.hash == '#tutorial1') {
+    if (document.location.hash == '#tutorial') {
         ui.init(puzzleSetTutorial);
     }
-    if (document.location.hash == '#tutorial2') {
-        ui.init(puzzleSetTutorial2);
+    if (document.location.hash == '#twist') {
+        ui.init(puzzleSetTwist);
+    }
+    if (document.location.hash == '#finale') {
+        ui.init(puzzleSetFinale);
     }
 }
