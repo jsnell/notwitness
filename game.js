@@ -351,10 +351,7 @@ function Game() {
             if (corner.type == 'entrance') {
                 line.segments.push([corner.c, corner.r]);
             }
-            if (corner.type == "exit" &&
-                corner.exitClass == 'clone') {
-                localCloneState[corner.cloneId] =  { type: "none" }
-            }
+
         });
     }
 
@@ -491,7 +488,6 @@ function Game() {
     };
 
     game.validateEdge = function(edge, lineEdges) {
-        console.log(edge, lineEdges);
         if (edge.type == 'blocked') {
             return true;
         } else if (edge.type == 'required') {
@@ -513,7 +509,6 @@ function Game() {
             } else {
                 ret = { type: 'none' }
             }
-            console.log(symbol, ret, cloneState, localCloneState);
             return $.extend({ r: symbol.r, c: symbol.c}, ret);
         }
         return symbol;
@@ -848,10 +843,8 @@ function Game() {
             }
         }
 
-        console.log(localCloneState, cloneState);
         game.drawSymbols(canvas, ctx, game.puzzle.area, function (symbol, ctx) {
             ctx.fillStyle = symbol.color;
-            console.log("draw ", symbol);
             return true;
         });
 
@@ -876,15 +869,24 @@ function Game() {
                                 ctx.lineTo(x, y);
                                 ctx.stroke();
 
+                                ctx.translate(x, y);
                                 ctx.beginPath();
-                                ctx.arc(x, y, 1, 2*Math.PI, 0);
+                                ctx.arc(0, 0, 1, 2*Math.PI, 0);
                                 ctx.fill();
 
                                 if (corner.exitClass == 'clone') {
                                     ctx.beginPath();
                                     ctx.lineWidth = 1;
                                     ctx.strokeStyle = '#da8';
-                                    ctx.arc(x, y, 2, 1*Math.PI, 0);
+                                    ctx.arc(0, 0, 2, 1*Math.PI, 0);
+                                    ctx.stroke();
+
+                                    ctx.beginPath();
+                                    ctx.lineWidth = 0.75;
+                                    ctx.rotate(Math.PI / 2);
+                                    ctx.rotate(cloneSymbolAngle(corner.cloneId));
+                                    ctx.moveTo(0, 1);
+                                    ctx.lineTo(0, 3);
                                     ctx.stroke();
                                 }
                             }
@@ -916,7 +918,12 @@ function Game() {
                         })
         });
     };
-    
+
+    function cloneSymbolAngle(cloneId) {
+        console.log(cloneId, game.puzzle.cloneIdAngles);
+        return game.puzzle.cloneIdAngles[cloneId];
+    }
+
     game.drawSymbols = function (canvas, ctx, symbols, thunk) {
         _(symbols).each(function (symbol) {
             WithContext(ctx, game.drawParams(symbol.c, symbol.r),
@@ -928,6 +935,14 @@ function Game() {
                                 ctx.strokeStyle = '#da8';
                                 ctx.arc(0, 0, 3, 0, 1 * Math.PI);
                                 ctx.stroke();
+
+                                ctx.beginPath();
+                                ctx.rotate(-Math.PI / 2);
+                                ctx.rotate(cloneSymbolAngle(symbol.cloneId));
+                                ctx.moveTo(0, 2);
+                                ctx.lineTo(0, 4);
+                                ctx.stroke();
+                                
                                 ctx.restore();
                             }
 
@@ -1017,6 +1032,24 @@ function UserInterface() {
             ui.redraw();
         };
         puzzleNames = _(puzzles).keys();
+        var cloneIds = {};
+        _(puzzles).each(function(puzzle) {
+            _(puzzle.corner).each(function(corner) {
+                if (corner.type == 'exit' && corner.exitClass == 'clone') {
+                    if (!cloneIds[corner.cloneId]) {
+                        cloneIds[corner.cloneId] = _(cloneIds).size();
+                    }
+                }
+            });
+        });
+        var scale = Math.max(1, _(cloneIds).size() - 1);
+        var cloneIdAngles = _.mapObject(cloneIds, function(val, key) {
+            return Math.PI * val / scale;
+        });
+        _(puzzles).each(function(puzzle) {
+            puzzle.cloneIdAngles = cloneIdAngles;
+        });
+         
         _(puzzleNames).each(function(name) {
             ui.initScreenshot(name);
         });
