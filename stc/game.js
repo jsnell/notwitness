@@ -1100,10 +1100,14 @@ function UserInterface() {
                           var map_canvas = document.getElementById("canvas-map");
                           game.drawBase(map_canvas,
                                         map_canvas.getContext("2d"));
-                          if (game.won() && game.puzzle.unlock) {
-                              var unlocked = puzzles[game.puzzle.unlock];
-                              unlocked.active = true;
-                              ui.updateScreenshot(ui.ensureGame(game.puzzle.unlock));
+                          if (game.won()) {
+                              if (game.puzzle.unlock) {
+                                  var unlocked = puzzles[game.puzzle.unlock];
+                                  unlocked.active = true;
+                                  ui.updateScreenshot(ui.ensureGame(game.puzzle.unlock));
+                              } else {
+                                  $('div.puzzle-selector').append("<b>Congratulations! Puzzle set finished.</b>");
+                              }
                           }
                       });
         }

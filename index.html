@@ -11,8 +11,8 @@
     }
     div.puzzle-selector {
         margin-left: 20px;
-        overflow: auto;
-        height: 128;
+        overflow: hidden;
+        height: 160;
         width: 800;
     }
     div.puzzle-selector img {
@@ -34,7 +34,7 @@
     <canvas id="canvas-map" width=480 height=480 class="game-canvas" style="z-index: 1"></canvas>
     <canvas id="canvas-screenshot" style="display: none" width=480 height=480></canvas>
   </div>
-  <div class='puzzle-selector'></div>
+  <div class='puzzle-selector'><p>Select a puzzle set to start playing.</p></div>
 
   <div style="width: 250px; position: absolute; left: 550px; top: 20px;">
     <p>
