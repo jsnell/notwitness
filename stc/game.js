@@ -380,7 +380,10 @@ function Game() {
             if (corner.type == 'entrance') {
                 line.segments.push([corner.c, corner.r]);
             }
-
+            if (corner.type == "exit" &&
+                corner.exitClass == 'clone') {
+                localCloneState[corner.cloneId] =  { type: "none" }
+            }
         });
     }
 
