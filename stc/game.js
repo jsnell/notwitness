@@ -310,7 +310,7 @@ var puzzleSetTwist = {
             edge: [
             ],
             corner: [
-                { r: 0, c: 1, type: "exit", direction: 'up', exitClass: "clone", cloneId: "twist3" },
+                { r: 0, c: 1, type: "exit", direction: 'up' },
                 { r: 2, c: 1, type: "entrance" },
             ],
             unlock: "twist4",
@@ -320,7 +320,7 @@ var puzzleSetTwist = {
             rows: 3,
             cols: 3,
             area: [
-                { r: 1.5, c: 0.5, type: "clone", cloneId: "twist3" },
+                { r: 1.5, c: 0.5, type: "blob", color: "black" },
                 { r: 1.5, c: 1.5, type: "blob", color: "white" },
             ],
             edge: [
