@@ -568,7 +568,8 @@ function Game() {
             } else {
                 ret = { type: 'none' }
             }
-            return $.extend({ r: symbol.r, c: symbol.c}, ret);
+            return $.extend($.extend({}, ret),
+                            { r: symbol.r, c: symbol.c });
         }
         return symbol;
     }
