@@ -22,312 +22,339 @@ var cloneState = {
 };
 
 var puzzleSetTutorial = {
-    tutorial0: {
-        rows: 3,
-        cols: 2,
-        area: [
-            { r: 1.5, c: 0.5, type: "blob", color: "white" },
-        ],
-        edge: [
-        ],
-        corner: [
-            { r: 0, c: 1, type: "exit", direction: 'up' },
-            { r: 2, c: 0, type: "entrance" },
-        ],
-        unlock: "tutorial1",
-        active: true,
+    cloneSymbolColor: {
+        'tutorial1': '#ff4',
+        'tutorial2': '#4f4',
+        'tutorial3': '#ff4',
+        'tutorial4': '#4ff',
+        'tutorial5': '#f4f',
     },
-    tutorial1: {
-        rows: 3,
-        cols: 4,
-        area: [
-            { r: 1.5, c: 0.5, type: "blob", color: "white" },
-            { r: 0.5, c: 2.5, type: "clone", cloneId: 'tutorial1' },
-        ],
-        edge: [
-        ],
-        corner: [
-            { r: 0, c: 1, type: "exit", direction: 'up', exitClass: "clone", cloneId: "tutorial1" },
-            { r: 2, c: 0, type: "entrance" },
-        ],
-        unlock: "tutorial2",
-        active: false,
-    },
-    tutorial2: {
-        rows: 4,
-        cols: 6,
-        area: [
-            { r: 1.5, c: 0.5, type: "blob", color: "white" },
-            { r: 1.5, c: 4.5, type: "blob", color: "orange" },
-            { r: 1.5, c: 2.5, type: "blob", color: "black" },
-            { r: 2.5, c: 0.5, type: "clone", cloneId: 'tutorial2' },
-        ],
-        edge: [
-        ],
-        corner: [
-            { r: 0, c: 0, type: "exit", direction: 'up', exitClass: "clone", cloneId: "tutorial2" },
-            { r: 3, c: 2, type: "entrance" },
-        ],
-        unlock: "tutorial3",
-        active: false,
-    },
-    tutorial3: {
-        rows: 4,
-        cols: 3,
-        area: [
-            { r: 1.5, c: 0.5, type: "star", color: "white" },
-            { r: 1.5, c: 1.5, type: "star", color: "white" },
-            { r: 2.5, c: 0.5, type: "clone", cloneId: 'tutorial3' },
-        ],
-        edge: [
-        ],
-        corner: [
-            { r: 0, c: 0, type: "exit", direction: 'up', exitClass: "clone", cloneId: "tutorial3" },
-            { r: 0, c: 2, type: "exit", direction: 'up' },
-            { r: 3, c: 0, type: "entrance" },
-        ],
-        unlock: "tutorial4",
-        active: false,
-    },
-    tutorial4: {
-        rows: 4,
-        cols: 3,
-        area: [
-            { r: 1.5, c: 0.5, type: "star", color: "white" },
-            { r: 1.5, c: 1.5, type: "blob", color: "black" },
-            { r: 2.5, c: 0.5, type: "clone", cloneId: 'tutorial4' },
-        ],
-        edge: [
-        ],
-        corner: [
-            { r: 0, c: 1, type: "exit", direction: 'up', exitClass: "clone", cloneId: "tutorial4" },
-            { r: 3, c: 1, type: "entrance" },
-        ],
-        unlock: "tutorial5",
-        active: false,
-    },
-    tutorial5: {
-        rows: 5,
-        cols: 4,
-        area: [
-            { r: 2.5, c: 0.5, type: "star", color: "white" },
-            { r: 2.5, c: 2.5, type: "star", color: "white" },
-            { r: 0.5, c: 0.5, type: "clone", cloneId: 'tutorial5' },
-        ],
-        edge: [
-        ],
-        corner: [
-            { r: 0, c: 2, type: "exit", direction: 'up', exitClass: "clone", cloneId: "tutorial5" },
-            { r: 4, c: 2, type: "entrance" },
-        ],
-        active: false,
+    puzzles: {
+        tutorial0: {
+            rows: 3,
+            cols: 2,
+            area: [
+                { r: 1.5, c: 0.5, type: "blob", color: "white" },
+            ],
+            edge: [
+            ],
+            corner: [
+                { r: 0, c: 1, type: "exit", direction: 'up' },
+                { r: 2, c: 0, type: "entrance" },
+            ],
+            unlock: "tutorial1",
+            active: true,
+        },
+        tutorial1: {
+            rows: 3,
+            cols: 4,
+            area: [
+                { r: 1.5, c: 0.5, type: "blob", color: "white" },
+                { r: 0.5, c: 2.5, type: "clone", cloneId: 'tutorial1' },
+            ],
+            edge: [
+            ],
+            corner: [
+                { r: 0, c: 1, type: "exit", direction: 'up', exitClass: "clone", cloneId: "tutorial1" },
+                { r: 2, c: 0, type: "entrance" },
+            ],
+            unlock: "tutorial2",
+            active: false,
+        },
+        tutorial2: {
+            rows: 4,
+            cols: 6,
+            area: [
+                { r: 1.5, c: 0.5, type: "blob", color: "white" },
+                { r: 1.5, c: 4.5, type: "blob", color: "orange" },
+                { r: 1.5, c: 2.5, type: "blob", color: "black" },
+                { r: 2.5, c: 0.5, type: "clone", cloneId: 'tutorial2' },
+            ],
+            edge: [
+            ],
+            corner: [
+                { r: 0, c: 0, type: "exit", direction: 'up', exitClass: "clone", cloneId: "tutorial2" },
+                { r: 3, c: 2, type: "entrance" },
+            ],
+            unlock: "tutorial3",
+            active: false,
+        },
+        tutorial3: {
+            rows: 4,
+            cols: 3,
+            area: [
+                { r: 1.5, c: 0.5, type: "star", color: "white" },
+                { r: 1.5, c: 1.5, type: "star", color: "white" },
+                { r: 2.5, c: 0.5, type: "clone", cloneId: 'tutorial3' },
+            ],
+            edge: [
+            ],
+            corner: [
+                { r: 0, c: 0, type: "exit", direction: 'up', exitClass: "clone", cloneId: "tutorial3" },
+                { r: 0, c: 2, type: "exit", direction: 'up' },
+                { r: 3, c: 0, type: "entrance" },
+            ],
+            unlock: "tutorial4",
+            active: false,
+        },
+        tutorial4: {
+            rows: 4,
+            cols: 3,
+            area: [
+                { r: 1.5, c: 0.5, type: "star", color: "white" },
+                { r: 1.5, c: 1.5, type: "blob", color: "black" },
+                { r: 2.5, c: 0.5, type: "clone", cloneId: 'tutorial4' },
+            ],
+            edge: [
+            ],
+            corner: [
+                { r: 0, c: 1, type: "exit", direction: 'up', exitClass: "clone", cloneId: "tutorial4" },
+                { r: 3, c: 1, type: "entrance" },
+            ],
+            unlock: "tutorial5",
+            active: false,
+        },
+        tutorial5: {
+            rows: 5,
+            cols: 4,
+            area: [
+                { r: 2.5, c: 0.5, type: "star", color: "white" },
+                { r: 2.5, c: 2.5, type: "star", color: "white" },
+                { r: 0.5, c: 0.5, type: "clone", cloneId: 'tutorial5' },
+            ],
+            edge: [
+            ],
+            corner: [
+                { r: 0, c: 2, type: "exit", direction: 'up', exitClass: "clone", cloneId: "tutorial5" },
+                { r: 4, c: 2, type: "entrance" },
+            ],
+            active: false,
+        },
     },
 };
 
 var puzzleSetTwist = {
-    twist1: {
-        rows: 3,
-        cols: 3,
-        area: [
-            { r: 0.5, c: 0.5, type: "blob", color: "black" },
-        ],
-        edge: [
-        ],
-        corner: [
-            { r: 0, c: 1, type: "exit", direction: 'up', exitClass: "clone", cloneId: "twist1" },
-            { r: 2, c: 0, type: "entrance" },
-        ],
-        unlock: "twist2",
-        active: true,
+    cloneSymbolColor: {
+        'twist1': '#ff4',
+        'twist2': '#4f4',
+        'twist3': '#ff4',
+        'twist4': '#4ff',
+        'twist5': '#f4f',
     },
-    twist2: {
-        rows: 3,
-        cols: 4,
-        area: [
-            { r: 0.5, c: 0.5, type: "blob", color: "white" },
-            { r: 1.5, c: 0.5, type: "blob", color: "white" },
-            { r: 1.5, c: 2.5, type: "clone", cloneId: "twist1" },
-        ],
-        edge: [
-        ],
-        corner: [
-            { r: 0, c: 1, type: "exit", direction: 'up', exitClass: "clone", cloneId: "twist2" },
-            { r: 2, c: 1, type: "entrance" },
-        ],
-        unlock: "twist3",
-        active: false,
-    },
-    twist3: {
-        rows: 3,
-        cols: 3,
-        area: [
-            { r: 0.5, c: 0.5, type: "clone", cloneId: "twist2" },
-            { r: 0.5, c: 1.5, type: "blob", color: "black" },
-            { r: 1.5, c: 0.5, type: "blob", color: "black" },
-            { r: 1.5, c: 1.5, type: "blob", color: "white" },
-        ],
-        edge: [
-        ],
-        corner: [
-            { r: 0, c: 1, type: "exit", direction: 'up', exitClass: "clone", cloneId: "twist3" },
-            { r: 2, c: 1, type: "entrance" },
-        ],
-        unlock: "twist4",
-        active: false,
-    },
-    twist4: {
-        rows: 3,
-        cols: 3,
-        area: [
-            { r: 1.5, c: 0.5, type: "clone", cloneId: "twist3" },
-            { r: 1.5, c: 1.5, type: "blob", color: "white" },
-        ],
-        edge: [
-        ],
-        corner: [
-            { r: 0, c: 1, type: "exit", direction: 'up',
-              exitClass: "clone", cloneId: "twist4" },
-            { r: 2, c: 1, type: "entrance" },
-        ],
-        unlock: "twist5",
-        active: false,
-    },
-    twist5: {
-        rows: 3,
-        cols: 3,
-        area: [
-            { r: 0.5, c: 1.5, type: "clone", cloneId: "twist4" },
-            { r: 0.5, c: 0.5, type: "star", color: "white" },
-        ],
-        edge: [
-        ],
-        corner: [
-            { r: 0, c: 0, type: "exit", direction: 'up',
-              exitClass: "clone", cloneId: "twist5" },
-            { r: 0, c: 1, type: "exit", direction: 'up' },
-            { r: 2, c: 1, type: "entrance" },
-        ],
-        unlock: "twist6",
-        active: false,
-    },
-    twist6: {
-        rows: 3,
-        cols: 3,
-        area: [
-            { r: 1.5, c: 1.5, type: "clone", cloneId: "twist5" },
-            { r: 1.5, c: 0.5, type: "star", color: "white" },
-            { r: 0.5, c: 1.5, type: "star", color: "white" },
-        ],
-        edge: [
-            { r: 1, c: 1.5, type: "blocked" },            
-        ],
-        corner: [
-            { r: 0, c: 1, type: "exit", direction: 'up' },
-            { r: 2, c: 1, type: "entrance" },
-        ],
-        active: false,
+    puzzles: {
+        twist1: {
+            rows: 3,
+            cols: 3,
+            area: [
+                { r: 0.5, c: 0.5, type: "blob", color: "black" },
+            ],
+            edge: [
+            ],
+            corner: [
+                { r: 0, c: 1, type: "exit", direction: 'up', exitClass: "clone", cloneId: "twist1" },
+                { r: 2, c: 0, type: "entrance" },
+            ],
+            unlock: "twist2",
+            active: true,
+        },
+        twist2: {
+            rows: 3,
+            cols: 4,
+            area: [
+                { r: 0.5, c: 0.5, type: "blob", color: "white" },
+                { r: 1.5, c: 0.5, type: "blob", color: "white" },
+                { r: 1.5, c: 2.5, type: "clone", cloneId: "twist1" },
+            ],
+            edge: [
+            ],
+            corner: [
+                { r: 0, c: 1, type: "exit", direction: 'up', exitClass: "clone", cloneId: "twist2" },
+                { r: 2, c: 1, type: "entrance" },
+            ],
+            unlock: "twist3",
+            active: false,
+        },
+        twist3: {
+            rows: 3,
+            cols: 3,
+            area: [
+                { r: 0.5, c: 0.5, type: "clone", cloneId: "twist2" },
+                { r: 0.5, c: 1.5, type: "blob", color: "black" },
+                { r: 1.5, c: 0.5, type: "blob", color: "black" },
+                { r: 1.5, c: 1.5, type: "blob", color: "white" },
+            ],
+            edge: [
+            ],
+            corner: [
+                { r: 0, c: 1, type: "exit", direction: 'up', exitClass: "clone", cloneId: "twist3" },
+                { r: 2, c: 1, type: "entrance" },
+            ],
+            unlock: "twist4",
+            active: false,
+        },
+        twist4: {
+            rows: 3,
+            cols: 3,
+            area: [
+                { r: 1.5, c: 0.5, type: "clone", cloneId: "twist3" },
+                { r: 1.5, c: 1.5, type: "blob", color: "white" },
+            ],
+            edge: [
+            ],
+            corner: [
+                { r: 0, c: 1, type: "exit", direction: 'up',
+                  exitClass: "clone", cloneId: "twist4" },
+                { r: 2, c: 1, type: "entrance" },
+            ],
+            unlock: "twist5",
+            active: false,
+        },
+        twist5: {
+            rows: 3,
+            cols: 3,
+            area: [
+                { r: 0.5, c: 1.5, type: "clone", cloneId: "twist4" },
+                { r: 0.5, c: 0.5, type: "star", color: "white" },
+            ],
+            edge: [
+            ],
+            corner: [
+                { r: 0, c: 0, type: "exit", direction: 'up',
+                  exitClass: "clone", cloneId: "twist5" },
+                { r: 0, c: 1, type: "exit", direction: 'up' },
+                { r: 2, c: 1, type: "entrance" },
+            ],
+            unlock: "twist6",
+            active: false,
+        },
+        twist6: {
+            rows: 3,
+            cols: 3,
+            area: [
+                { r: 1.5, c: 1.5, type: "clone", cloneId: "twist5" },
+                { r: 1.5, c: 0.5, type: "star", color: "white" },
+                { r: 0.5, c: 1.5, type: "star", color: "white" },
+            ],
+            edge: [
+                { r: 1, c: 1.5, type: "blocked" },            
+            ],
+            corner: [
+                { r: 0, c: 1, type: "exit", direction: 'up' },
+                { r: 2, c: 1, type: "entrance" },
+            ],
+            active: false,
+        }
     },
 };
 
 var puzzleSetFinale = {
-    finale1: {
-        rows: 5,
-        cols: 6,
-        area: [
-            { r: 1.5, c: 0.5, type: "blob", color: "black" },
-            { r: 2.5, c: 1.5, type: "blob", color: "white" },
-            { r: 1.5, c: 3.5, type: "blob", color: "green" },
-            { r: 2.5, c: 4.5, type: "blob", color: "orange" },
-        ],
-        edge: [
-        ],
-        corner: [
-            { r: 0, c: 5, type: "exit", direction: 'up', exitClass: "clone", cloneId: "finale1" },
-            { r: 4, c: 0, type: "entrance" },
-        ],
-        unlock: "finale2",
-        active: true,
+    cloneSymbolColor: {
+        'finale1': '#ff4',
+        'finale2': '#4f4',
+        'finale3': '#ff4',
+        'finale4': '#4ff',
+        'finale5': '#f4f',
     },
-    finale2: {
-        rows: 5,
-        cols: 5,
-        area: [
-            { r: 0.5, c: 0.5, type: "blob", color: "orange" },
-            { r: 0.5, c: 3.5, type: "blob", color: "green" },
-            { r: 1.5, c: 1.5, type: "star", color: "white" },
-            { r: 2.5, c: 1.5, type: "star", color: "orange" },
-            { r: 3.5, c: 3.5, type: "blob", color: "white" },
-            { r: 2.5, c: 2.5, type: "clone", cloneId: "finale1" },
-        ],
-        edge: [
-            { r: 1.5, c: 0, type: "required", color: "black" },
-        ],
-        corner: [
-            { r: 0, c: 0, type: "exit", direction: 'up', exitClass: "clone", cloneId: "finale2" },
-            { r: 0, c: 4, type: "exit", direction: 'up', exitClass: "clone", cloneId: "finale2" },
-            { r: 4, c: 2, type: "entrance" },
-        ],
-        unlock: "finale3",
-        active: false,
-    },
-    finale3: {
-        rows: 7,
-        cols: 7,
-        area: [
-            { r: 0.5, c: 0.5, type: "star", color: "white" },
-            { r: 1.5, c: 3.5, type: "blob", color: "white" },
-            { r: 0.5, c: 4.5, type: "blob", color: "orange" },
-            { r: 0.5, c: 5.5, type: "blob", color: "green" },
-            { r: 5.5, c: 5.5, type: "blob", color: "green" },
-            { r: 1.5, c: 0.5, type: "blob", color: "orange" },
-            { r: 5.5, c: 4.5, type: "blob", color: "orange" },
-            { r: 3.5, c: 0.5, type: "blob", color: "green" },
-            { r: 5.5, c: 0.5, type: "blob", color: "black" },
-            { r: 5.5, c: 2.5, type: "blob", color: "black" },
-            // orange / green blob
-            { r: 3.5, c: 4.5, type: "clone", cloneId: "finale2" },            
-            // { r: 3.5, c: 4.5, type: "blob", color: "orange" },
-            // { r: 3.5, c: 4.5, type: "blob", color: "green" },
-        ],
-        edge: [
-            { r: 1, c: 3.5, type: "blocked" },
-            { r: 4, c: 4.5, type: "blocked" },
-        ],
-        corner: [
-            { r: 0, c: 3, type: "exit", direction: 'up', exitClass: "clone", cloneId: "finale3" },
-            { r: 6, c: 3, type: "entrance" },
-        ],
-        unlock: "finale4",
-        active: false,
-    },
-    finale4: {
-        rows: 7,
-        cols: 7,
-        area: [
-            { r: 1.5, c: 0.5, type: "blob", color: "black" },
-            { r: 1.5, c: 3.5, type: "blob", color: "black" },
-            { r: 4.5, c: 0.5, type: "blob", color: "black" },
-            { r: 5.5, c: 1.5, type: "star", color: "green" },
-            { r: 1.5, c: 5.5, type: "star", color: "green" },
-            { r: 5.5, c: 0.5, type: "star", color: "white" },            
-            { r: 0.5, c: 5.5, type: "blob", color: "white" },            
-            { r: 5.5, c: 2.5, type: "blob", color: "orange" },
-            { r: 2.5, c: 5.5, type: "blob", color: "orange" },
-            { r: 4.5, c: 5.5, type: "blob", color: "orange" },
-            { r: 4.5, c: 3.5, type: "blob", color: "cyan" },
-            { r: 5.5, c: 4.5, type: "blob", color: "cyan" },
-            // Clone, white star or orange blob
-            { r: 0.5, c: 0.5, type: "clone", cloneId: "finale3" },            
-            // { r: 0.5, c: 0.5, type: "star", color: "white" },
-            // { r: 0.5, c: 0.5, type: "blob", color: "orange" },
-        ],
-        edge: [
-        ],
-        corner: [
-            { r: 0, c: 3, type: "exit", direction: 'up' },
-            { r: 6, c: 3, type: "entrance" },
-        ],
-        active: false,
+    puzzles: {
+        finale1: {
+            rows: 5,
+            cols: 6,
+            area: [
+                { r: 1.5, c: 0.5, type: "blob", color: "black" },
+                { r: 2.5, c: 1.5, type: "blob", color: "white" },
+                { r: 1.5, c: 3.5, type: "blob", color: "green" },
+                { r: 2.5, c: 4.5, type: "blob", color: "orange" },
+            ],
+            edge: [
+            ],
+            corner: [
+                { r: 0, c: 5, type: "exit", direction: 'up', exitClass: "clone", cloneId: "finale1" },
+                { r: 4, c: 0, type: "entrance" },
+            ],
+            unlock: "finale2",
+            active: true,
+        },
+        finale2: {
+            rows: 5,
+            cols: 5,
+            area: [
+                { r: 0.5, c: 0.5, type: "blob", color: "orange" },
+                { r: 0.5, c: 3.5, type: "blob", color: "green" },
+                { r: 1.5, c: 1.5, type: "star", color: "white" },
+                { r: 2.5, c: 1.5, type: "star", color: "orange" },
+                { r: 3.5, c: 3.5, type: "blob", color: "white" },
+                { r: 2.5, c: 2.5, type: "clone", cloneId: "finale1" },
+            ],
+            edge: [
+                { r: 1.5, c: 0, type: "required", color: "black" },
+            ],
+            corner: [
+                { r: 0, c: 0, type: "exit", direction: 'up', exitClass: "clone", cloneId: "finale2" },
+                { r: 0, c: 4, type: "exit", direction: 'up', exitClass: "clone", cloneId: "finale2" },
+                { r: 4, c: 2, type: "entrance" },
+            ],
+            unlock: "finale3",
+            active: false,
+        },
+        finale3: {
+            rows: 7,
+            cols: 7,
+            area: [
+                { r: 0.5, c: 0.5, type: "star", color: "white" },
+                { r: 1.5, c: 3.5, type: "blob", color: "white" },
+                { r: 0.5, c: 4.5, type: "blob", color: "orange" },
+                { r: 0.5, c: 5.5, type: "blob", color: "green" },
+                { r: 5.5, c: 5.5, type: "blob", color: "green" },
+                { r: 1.5, c: 0.5, type: "blob", color: "orange" },
+                { r: 5.5, c: 4.5, type: "blob", color: "orange" },
+                { r: 3.5, c: 0.5, type: "blob", color: "green" },
+                { r: 5.5, c: 0.5, type: "blob", color: "black" },
+                { r: 5.5, c: 2.5, type: "blob", color: "black" },
+                // orange / green blob
+                { r: 3.5, c: 4.5, type: "clone", cloneId: "finale2" },            
+                // { r: 3.5, c: 4.5, type: "blob", color: "orange" },
+                // { r: 3.5, c: 4.5, type: "blob", color: "green" },
+            ],
+            edge: [
+                { r: 1, c: 3.5, type: "blocked" },
+                { r: 4, c: 4.5, type: "blocked" },
+            ],
+            corner: [
+                { r: 0, c: 3, type: "exit", direction: 'up', exitClass: "clone", cloneId: "finale3" },
+                { r: 6, c: 3, type: "entrance" },
+            ],
+            unlock: "finale4",
+            active: false,
+        },
+        finale4: {
+            rows: 7,
+            cols: 7,
+            area: [
+                { r: 1.5, c: 0.5, type: "blob", color: "black" },
+                { r: 1.5, c: 3.5, type: "blob", color: "black" },
+                { r: 4.5, c: 0.5, type: "blob", color: "black" },
+                { r: 5.5, c: 1.5, type: "star", color: "green" },
+                { r: 1.5, c: 5.5, type: "star", color: "green" },
+                { r: 5.5, c: 0.5, type: "star", color: "white" },            
+                { r: 0.5, c: 5.5, type: "blob", color: "white" },            
+                { r: 5.5, c: 2.5, type: "blob", color: "orange" },
+                { r: 2.5, c: 5.5, type: "blob", color: "orange" },
+                { r: 4.5, c: 5.5, type: "blob", color: "orange" },
+                { r: 4.5, c: 3.5, type: "blob", color: "cyan" },
+                { r: 5.5, c: 4.5, type: "blob", color: "cyan" },
+                // Clone, white star or orange blob
+                { r: 0.5, c: 0.5, type: "clone", cloneId: "finale3" },            
+                // { r: 0.5, c: 0.5, type: "star", color: "white" },
+                // { r: 0.5, c: 0.5, type: "blob", color: "orange" },
+            ],
+            edge: [
+            ],
+            corner: [
+                { r: 0, c: 3, type: "exit", direction: 'up' },
+                { r: 6, c: 3, type: "entrance" },
+            ],
+            active: false,
+        },
     },
 };
 
@@ -909,16 +936,8 @@ function Game() {
                                 if (corner.exitClass == 'clone') {
                                     ctx.beginPath();
                                     ctx.lineWidth = 1;
-                                    ctx.strokeStyle = '#da8';
+                                    ctx.strokeStyle = cloneSymbolColor(corner);
                                     ctx.arc(0, 0, 2, 1*Math.PI, 0);
-                                    ctx.stroke();
-
-                                    ctx.beginPath();
-                                    ctx.lineWidth = 0.75;
-                                    ctx.rotate(Math.PI / 2);
-                                    ctx.rotate(cloneSymbolAngle(corner.cloneId));
-                                    ctx.moveTo(0, 1);
-                                    ctx.lineTo(0, 3);
                                     ctx.stroke();
                                 }
                             }
@@ -951,8 +970,8 @@ function Game() {
         });
     };
 
-    function cloneSymbolAngle(cloneId) {
-        return game.puzzle.cloneIdAngles[cloneId];
+    function cloneSymbolColor(symbol) {
+        return game.puzzle.cloneSymbolColor[symbol.cloneId];
     }
 
     game.drawSymbols = function (canvas, ctx, symbols, thunk) {
@@ -963,17 +982,9 @@ function Game() {
                                 ctx.save();
                                 ctx.beginPath();
                                 ctx.lineWidth = 1;
-                                ctx.strokeStyle = '#da8';
+                                ctx.strokeStyle = cloneSymbolColor(symbol);
                                 ctx.arc(0, 0, 3, 0, 1 * Math.PI);
-                                ctx.stroke();
-
-                                ctx.beginPath();
-                                ctx.rotate(-Math.PI / 2);
-                                ctx.rotate(cloneSymbolAngle(symbol.cloneId));
-                                ctx.moveTo(0, 2);
-                                ctx.lineTo(0, 4);
-                                ctx.stroke();
-                                
+                                ctx.stroke();                                
                                 ctx.restore();
                             }
 
@@ -1043,7 +1054,7 @@ function UserInterface() {
             game = null;
             games = {};
         }
-        puzzles = puzzleSet;
+        puzzles = puzzleSet.puzzles;
         cloneState = {};
         ui.redraw = function() {
             var objects_canvas = document.getElementById("canvas-objects");
@@ -1072,12 +1083,8 @@ function UserInterface() {
                 }
             });
         });
-        var scale = Math.max(1, _(cloneIds).size() - 1);
-        var cloneIdAngles = _.mapObject(cloneIds, function(val, key) {
-            return Math.PI * val / scale;
-        });
         _(puzzles).each(function(puzzle) {
-            puzzle.cloneIdAngles = cloneIdAngles;
+            puzzle.cloneSymbolColor = puzzleSet.cloneSymbolColor;
         });
         
         return ui;
@@ -1085,10 +1092,12 @@ function UserInterface() {
 
     ui.enable = function() {
         $('div.puzzle-selector').text("");
+
         _(puzzleNames).each(function(name) {
             var g = ui.ensureGame(name);
             ui.updateScreenshot(g);
         });
+
         if (game) {
             ui.switchToPuzzle(game.puzzle.name);
         } else {
