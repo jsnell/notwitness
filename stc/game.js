@@ -371,7 +371,7 @@ function Game() {
         game.cloneOutput = null;
         localCloneState = {};
 
-        line = {
+        game.line = line = {
             segments: [],
             next: null,
         }
@@ -1122,6 +1122,13 @@ function UserInterface() {
                                   $('div.puzzle-selector').append("<b>Congratulations! Puzzle set finished.</b>");
                               }
                           }
+                          $.ajax({
+                              url: "/app/result",
+                              data: { win: game.won(),
+                                      level: game.puzzle.name,
+                                      line: game.line.segments.join("-") },
+                              cache: false
+                          });
                       });
         }
         return game;
@@ -1263,4 +1270,8 @@ function init() {
     uis['#tutorial'] = new UserInterface().init(puzzleSetTutorial);
     uis['#twist'] = new UserInterface().init(puzzleSetTwist);
     uis['#finale'] = new UserInterface().init(puzzleSetFinale);
+
+    if (uis[document.location.hash]) {
+        switchToSet(document.location.hash);
+    }
 }
