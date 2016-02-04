@@ -25,7 +25,7 @@ var puzzleSetTutorial = {
     cloneSymbolColor: {
         'tutorial1': '#ff4',
         'tutorial2': '#4f4',
-        'tutorial3': '#ff4',
+        'tutorial3': '#f44',
         'tutorial4': '#4ff',
         'tutorial5': '#f4f',
     },
@@ -137,7 +137,7 @@ var puzzleSetTwist = {
     cloneSymbolColor: {
         'twist1': '#ff4',
         'twist2': '#4f4',
-        'twist3': '#ff4',
+        'twist3': '#f44',
         'twist4': '#4ff',
         'twist5': '#f4f',
     },
@@ -251,7 +251,7 @@ var puzzleSetFinale = {
     cloneSymbolColor: {
         'finale1': '#ff4',
         'finale2': '#4f4',
-        'finale3': '#ff4',
+        'finale3': '#f44',
         'finale4': '#4ff',
         'finale5': '#f4f',
     },
