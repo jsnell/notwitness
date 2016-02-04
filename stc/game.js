@@ -133,6 +133,130 @@ var puzzleSetTutorial = {
     },
 };
 
+var puzzleSetTurn = {
+    cloneSymbolColor: {
+        'turn1_1': '#ff4',
+        'turn1_2': '#4f4',
+        'turn2_1': '#f4f',
+        'turn2_2': '#44f',
+        'turn3_1': '#0af',
+        'turn3_2': '#fa0',
+        'turn4_1': '#4ff',
+        'turn4_2': '#f44',
+    },
+    puzzles: {
+        turn1: {
+            rows: 4,
+            cols: 6,
+            area: [
+                { r: 1.5, c: 0.5, type: "clone", cloneId: 'turn1_1' },
+                { r: 1.5, c: 4.5, type: "clone", cloneId: 'turn1_2' },
+                { r: 1.5, c: 2.5, type: "star", color: 'white' },
+            ],
+            edge: [
+                { r: 1, c: 0.5, type: "blocked" },
+                { r: 1.5, c: 1, type: "blocked" },
+                { r: 1.5, c: 0, type: "blocked" },
+                { r: 2, c: 0.5, type: "blocked" },
+                { r: 1, c: 4.5, type: "blocked" },
+                { r: 1.5, c: 5, type: "blocked" },
+                { r: 1.5, c: 4, type: "blocked" },
+                { r: 2, c: 4.5, type: "blocked" },
+            ],
+            corner: [
+                { r: 0, c: 0, type: "exit", direction: 'up', exitClass: "clone", cloneId: "turn1_1" },
+                { r: 0, c: 5, type: "exit", direction: 'up', exitClass: "clone", cloneId: "turn1_2" },
+                { r: 3, c: 0, type: "entrance" },
+            ],
+            unlock: "turn2",
+            active: true,
+        },
+        turn2: {
+            rows: 4,
+            cols: 6,
+            area: [
+                { r: 1.5, c: 0.5, type: "clone", cloneId: 'turn2_1' },
+                { r: 1.5, c: 4.5, type: "clone", cloneId: 'turn2_2' },
+                { r: 1.5, c: 2.5, type: "star", color: 'white' },
+                { r: 2.5, c: 0.5, type: "blob", color: 'white' },
+                { r: 2.5, c: 4.5, type: "blob", color: 'black' },
+            ],
+            edge: [
+                { r: 1, c: 0.5, type: "blocked" },
+                { r: 1.5, c: 1, type: "blocked" },
+                { r: 1.5, c: 0, type: "blocked" },
+                { r: 2, c: 0.5, type: "blocked" },
+                { r: 1, c: 4.5, type: "blocked" },
+                { r: 1.5, c: 5, type: "blocked" },
+                { r: 1.5, c: 4, type: "blocked" },
+                { r: 2, c: 4.5, type: "blocked" },
+            ],
+            corner: [
+                { r: 0, c: 0, type: "exit", direction: 'up', exitClass: "clone", cloneId: "turn2_1" },
+                { r: 0, c: 5, type: "exit", direction: 'up', exitClass: "clone", cloneId: "turn2_2" },
+                { r: 3, c: 0, type: "entrance" },
+            ],
+            unlock: "turn3",
+            active: false,
+        },
+        turn3: {
+            rows: 4,
+            cols: 6,
+            area: [
+                { r: 1.5, c: 4.5, type: "clone", cloneId: 'turn3_1' },
+                { r: 1.5, c: 0.5, type: "clone", cloneId: 'turn3_2' },
+                { r: 1.5, c: 2.5, type: "star", color: 'white' },
+                { r: 2.5, c: 0.5, type: "blob", color: 'white' },
+                { r: 2.5, c: 4.5, type: "blob", color: 'black' },
+            ],
+            edge: [
+                { r: 1, c: 0.5, type: "blocked" },
+                { r: 1.5, c: 1, type: "blocked" },
+                { r: 1.5, c: 0, type: "blocked" },
+                { r: 2, c: 0.5, type: "blocked" },
+                { r: 1, c: 4.5, type: "blocked" },
+                { r: 1.5, c: 5, type: "blocked" },
+                { r: 1.5, c: 4, type: "blocked" },
+                { r: 2, c: 4.5, type: "blocked" },
+            ],
+            corner: [
+                { r: 0, c: 0, type: "exit", direction: 'up', exitClass: "clone", cloneId: "turn3_1" },
+                { r: 0, c: 5, type: "exit", direction: 'up', exitClass: "clone", cloneId: "turn3_2" },
+                { r: 3, c: 0, type: "entrance" },
+            ],
+            unlock: "turn4",
+            active: false,
+        },
+        turn4: {
+            rows: 7,
+            cols: 7,
+            area: [
+                { r: 5.5, c: 2.5, type: "clone", cloneId: 'turn4_1' },
+                { r: 5.5, c: 3.5, type: "clone", cloneId: 'turn4_2' },
+                { r: 2.5, c: 3.5, type: "star", color: 'orange' },
+                { r: 0.5, c: 0.5, type: "blob", color: 'orange' },
+                { r: 0.5, c: 5.5, type: "blob", color: 'green' },
+                { r: 5.5, c: 4.5, type: "blob", color: 'green' },
+                { r: 5.5, c: 5.5, type: "blob", color: 'black' },
+                { r: 5.5, c: 0.5, type: "blob", color: 'black' },
+            ],
+            edge: [
+                { r: 0.5, c: 2, type: "blocked" },
+                { r: 0.5, c: 3, type: "blocked" },
+                { r: 0.5, c: 4, type: "blocked" },
+                { r: 0.5, c: 1, type: "required", color: 'black' },
+            ],
+            corner: [
+                { r: 0, c: 2, type: "exit", direction: 'up', exitClass: "clone", cloneId: "turn4_1" },
+                { r: 0, c: 4, type: "exit", direction: 'up', exitClass: "clone", cloneId: "turn4_2" },
+                { r: 6, c: 3, type: "entrance" },
+            ],
+            active: false,
+        },
+    },
+}
+
+
 var puzzleSetTwist = {
     cloneSymbolColor: {
         'twist1': '#ff4',
@@ -1281,6 +1405,7 @@ function switchToSet(name) {
 
 function init() {
     uis['#tutorial'] = new UserInterface().init(puzzleSetTutorial);
+    uis['#turn'] = new UserInterface().init(puzzleSetTurn);
     uis['#twist'] = new UserInterface().init(puzzleSetTwist);
     uis['#finale'] = new UserInterface().init(puzzleSetFinale);
 
